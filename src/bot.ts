@@ -1,4 +1,4 @@
-import { Bot, Context, session } from 'grammy';
+import { Bot, Context, session, SessionFlavor } from 'grammy';
 import dotenv from 'dotenv';
 import pool from './db/client.js';
 
@@ -8,18 +8,12 @@ import { contactKeyboard } from './keyboard/shareContact.js';
 import { mainMenuKeyboard } from './keyboard/mainMenu.js';
 import { carMenuKeyboard } from './keyboard/carMenu.js';
 import { backToMainKeyboard } from './keyboard/backToMenu.js';
+import { SessionData } from './types/SessionData.js';
+import { tripHistoryModule } from './modules/car/tripHistory.js';
 
 dotenv.config();
 
-// === Тип для контексту з сесією ===
-interface SessionData {
-  state: 'awaiting_kilometers' | null;
-  registered?: boolean; // додаємо стан зареєстрованого користувача
-}
-
-export type BotContext = Context & {
-  session: SessionData;
-};
+export type BotContext = Context & SessionFlavor<SessionData>;
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -31,13 +25,13 @@ const bot = new Bot<BotContext>(token);
 bot.use(
   session({
     initial: (): SessionData => ({
-      state: null,
       registered: false,
     }),
   })
 );
 
 bot.use(tripModule)
+bot.use(tripHistoryModule)
 
 // === Команда /start ===
 bot.command('start', async (ctx) => {
@@ -129,7 +123,10 @@ bot.on(':text', async (ctx) => {
     await ctx.reply('Введіть кількість кілометрів:', {
       reply_markup: backToMainKeyboard,
     });
-    ctx.session.state = 'awaiting_kilometers';
+
+    ctx.session.trip = {
+      state: 'awaiting_kilometers',
+    };
   }
 });
 

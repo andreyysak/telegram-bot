@@ -1,6 +1,7 @@
 export const carMenuKeyboard = {
   keyboard: [
     [{ text: '🛣️ Поїздка' }],
+    [{ text: '📜 Історія поїздок' }],
     [{ text: '⚙️ ТО' }],
     [{ text: '⛽ Паливо' }],
     [{ text: '🚿 Мийка' }],
