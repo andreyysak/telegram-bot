@@ -1,17 +1,20 @@
 import { Bot, Context, session } from 'grammy';
-import { Menu } from '@grammyjs/menu';
 import dotenv from 'dotenv';
-
 import pool from './db/client.js';
-import { carMenu } from './menu/carMenu.js';
-import { toolsMenu } from './menu/toolsMenu.js';
-import { salaryMenu } from './menu/salaryMenu.js';
+
+import { tripModule } from './modules/car/trip.js';
+
+import { contactKeyboard } from './keyboard/shareContact.js';
+import { mainMenuKeyboard } from './keyboard/mainMenu.js';
+import { carMenuKeyboard } from './keyboard/carMenu.js';
+import { backToMainKeyboard } from './keyboard/backToMenu.js';
 
 dotenv.config();
 
 // === Тип для контексту з сесією ===
 interface SessionData {
   state: 'awaiting_kilometers' | null;
+  registered?: boolean; // додаємо стан зареєстрованого користувача
 }
 
 export type BotContext = Context & {
@@ -22,53 +25,23 @@ const token = process.env.TELEGRAM_BOT_TOKEN;
 
 if (!token) throw new Error('Telegram bot token was not found');
 
-// === Створення бота ===
 const bot = new Bot<BotContext>(token);
 
-// === Головне меню ===
-const mainMenu = new Menu<BotContext>('main-menu')
-  .text('🚗 Car', async (ctx) => {
-    await ctx.reply('🚗 Ви обрали Car', { reply_markup: carMenu });
-  })
-  .text('💸 Salary', async (ctx) => {
-    await ctx.reply('💸 Ви обрали Salary', { reply_markup: salaryMenu });
-  })
-  .text('🛠️ Tools', async (ctx) => {
-    await ctx.reply('🛠️ Ви обрали Tools', { reply_markup: toolsMenu });
-  });
-
-// === Клавіатура для отримання контакту ===
-const contactKeyboard = {
-  keyboard: [
-    [
-      {
-        text: '📞 Поділитися контактом',
-        request_contact: true,
-      },
-    ],
-  ],
-  resize_keyboard: true,
-  one_time_keyboard: true,
-};
-
-// === Використання middleware ===
+// === Сесія ===
 bot.use(
   session({
     initial: (): SessionData => ({
       state: null,
+      registered: false,
     }),
   })
 );
 
-// 👇 Спочатку реєструємо усі меню
-bot.use(mainMenu);
-bot.use(carMenu);
-bot.use(salaryMenu);
-bot.use(toolsMenu);
+bot.use(tripModule)
 
 // === Команда /start ===
 bot.command('start', async (ctx) => {
-  await ctx.reply('Привіт! Будь ласка, поділіться своїм контактом:', {
+  await ctx.reply('Привіт! Щоб почати роботу, будь ласка, поділіться своїм контактом:', {
     reply_markup: contactKeyboard,
   });
 });
@@ -102,20 +75,17 @@ bot.on(':contact', async (ctx) => {
     if (res.rows.length > 0) {
       const user = res.rows[0];
       console.log('Користувач збережений:', user);
-
-      await ctx.reply(`✅ Реєстрація успішна!\nПривіт, ${first_name}!\nТвій номер: ${phone_number}\nID: ${user.id}`, {
-        reply_markup: { remove_keyboard: true }, // 👈 Приховуємо клавіатуру
+      await ctx.reply('✅ Реєстрація успішна!', {
+        reply_markup: mainMenuKeyboard,
       });
     } else {
       await ctx.reply(`👋 Привіт знову, ${first_name}!`, {
-        reply_markup: { remove_keyboard: true }, // 👈 Також приховуємо
+        reply_markup: mainMenuKeyboard,
       });
     }
 
-    // Після успішної реєстрації показуємо головне меню
-    await ctx.reply('Оберіть опцію нижче:', {
-      reply_markup: mainMenu,
-    });
+    // Позначаємо користувача як зареєстрованого
+    ctx.session.registered = true;
 
   } catch (error) {
     console.error('Помилка при роботі з БД:', error);
@@ -125,54 +95,42 @@ bot.on(':contact', async (ctx) => {
   }
 });
 
-// === Обробник тексту (наприклад, кілометраж) ===
+// === Обробка всіх інших повідомлень (до реєстрації) ===
 bot.on(':text', async (ctx) => {
-  if (ctx.session.state === 'awaiting_kilometers') {
-    const text = ctx.message?.text?.trim();
+  const text = ctx.message?.text;
 
-    if (!ctx.from) {
-      return ctx.reply('Помилка: користувач не знайдений.');
-    }
+  // Якщо користувач ще не зареєстрований
+  if (!ctx.session.registered) {
+    return ctx.reply('Будь ласка, спочатку поділіться своїм контактом.', {
+      reply_markup: contactKeyboard,
+    });
+  }
 
-    if (!text || text.trim() === '') {
-      return ctx.reply('Будь ласка, введіть коректне значення.');
-    }
+  // Якщо користувач уже зареєстрований, обробляємо команди
+  if (text === '⬅️ Назад до головного меню') {
+    return ctx.reply('Головне меню:', {
+      reply_markup: mainMenuKeyboard,
+    });
+  }
 
-    let km: number;
+  if (text === '🚗 Car') {
+    return ctx.reply('🚗 Ви обрали Car', {
+      reply_markup: carMenuKeyboard,
+    });
+  }
 
-    try {
-      km = parseFloat(text.replace(',', '.'));
+  if (text === '⬅️ Назад') {
+    return ctx.reply('⬅️ Повертаємось назад', {
+      reply_markup: mainMenuKeyboard,
+    });
+  }
 
-      if (isNaN(km)) {
-        return ctx.reply('Будь ласка, введіть правильне число.');
-      }
-
-      // Отримуємо ID користувача з БД за telegram_user_id
-      const userRes = await pool.query(
-        'SELECT id FROM users WHERE telegram_user_id = $1',
-        [ctx.from.id]
-      );
-
-      if (userRes.rows.length === 0) {
-        return ctx.reply('Користувача не знайдено у системі.');
-      }
-
-      const dbUserId = userRes.rows[0].id;
-
-      // Зберігаємо поїздку
-      await pool.query(
-        'INSERT INTO trips (user_id, kilometers) VALUES ($1, $2)',
-        [dbUserId, km]
-      );
-
-      await ctx.reply(`✅ Кілометраж ${km} км успішно збережено.`);
-      ctx.session.state = null; // Скидаємо стан
-
-    } catch (e) {
-      console.error('Помилка при збереженні поїздки:', e);
-      await ctx.reply('⚠️ Сталася помилка при збереженні.');
-    }
+  if (text === '🛣️ Поїздка') {
+    await ctx.reply('Введіть кількість кілометрів:', {
+      reply_markup: backToMainKeyboard,
+    });
+    ctx.session.state = 'awaiting_kilometers';
   }
 });
 
-export default bot;
+export default bot
