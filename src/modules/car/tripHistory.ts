@@ -9,7 +9,9 @@ tripHistoryModule.hears('📜 Історія поїздок', async (ctx) => {
   const telegramUserId = ctx.from?.id;
 
   if (!telegramUserId) {
-    return ctx.reply('❌ Не вдалося отримати ID користувача');
+    return ctx.reply('❌ Не вдалося отримати ID користувача', {
+      reply_markup: carMenuKeyboard,
+    });
   }
 
   try {
