@@ -5,13 +5,13 @@ import pool from './db/client.js';
 import { tripModule } from './modules/car/trip.js';
 import { tripHistoryModule } from './modules/car/tripHistory.js';
 import { weatherModule } from './modules/weather/weather.js';
+import { gasModule } from './modules/car/gas.js';
 
 import { contactKeyboard } from './keyboard/shareContact.js';
 import { CAR_MENU_TEXT, mainMenuKeyboard } from './keyboard/mainMenu.js';
-import { CAR_MENU, carMenuKeyboard } from './keyboard/carMenu.js';
-import { BACK_TO_MAIN_TEXT, backToMainKeyboard } from './keyboard/backToMenu.js';
+import { carMenuKeyboard } from './keyboard/carMenu.js';
+import { BACK_TO_MAIN_TEXT } from './keyboard/backToMenu.js';
 import { SessionData } from './types/SessionData.js';
-
 
 dotenv.config();
 
@@ -35,6 +35,7 @@ bot.use(
 bot.use(tripModule)
 bot.use(tripHistoryModule)
 bot.use(weatherModule)
+bot.use(gasModule)
 
 // === Команда /start ===
 bot.command('start', async (ctx) => {
@@ -120,16 +121,6 @@ bot.on(':text', async (ctx) => {
     return ctx.reply('⬅️ Повертаємось назад', {
       reply_markup: mainMenuKeyboard,
     });
-  }
-
-  if (text === CAR_MENU.TRIP) {
-    await ctx.reply('Введи кількість кілометрів:', {
-      reply_markup: backToMainKeyboard,
-    });
-
-    ctx.session.trip = {
-      state: 'awaiting_kilometers',
-    };
   }
 });
 

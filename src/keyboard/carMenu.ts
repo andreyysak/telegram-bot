@@ -4,6 +4,8 @@ export const CAR_MENU = {
   FUEL: '⛽ Паливо',
   WASH: '🚿 Мийка',
   TRIP_HISTORY: '📜 Історія поїздок',
+  STATISTIC: '📊 Статистика',
+  DOWNLOAD: '💾 Експорт',
   BACK: '⬅️ Назад',
 };
 
@@ -19,6 +21,10 @@ export const carMenuKeyboard = {
     ],
     [
       { text: CAR_MENU.TRIP_HISTORY },
+      { text: CAR_MENU.STATISTIC }
+    ],
+    [
+      { text: CAR_MENU.DOWNLOAD },
       { text: CAR_MENU.BACK }
     ],
   ],

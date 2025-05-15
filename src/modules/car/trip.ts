@@ -1,11 +1,11 @@
 import { Composer } from 'grammy';
 import pool from '../../db/client.js';
-import { carMenuKeyboard } from '../../keyboard/carMenu.js';
-import { BotContext } from '../../bot.js'; // Це вже має тип SessionData
+import { CAR_MENU, carMenuKeyboard } from '../../keyboard/carMenu.js';
+import { BotContext } from '../../bot.js'; 
 
 export const tripModule = new Composer<BotContext>();
 
-tripModule.hears('PathComponent', async (ctx) => {
+tripModule.hears(CAR_MENU.TRIP, async (ctx) => {
   await ctx.reply('Введи кілометраж:', {
     reply_markup: { remove_keyboard: true },
   });
@@ -21,7 +21,7 @@ tripModule.on(':text').filter(
   async (ctx) => {
     const text = ctx.message?.text.trim();
 
-    if (!text) throw new Error('Не отримано жодних даних.')
+    if (!text) throw new Error('❌ Не отримано жодних даних.')
 
     const km = parseFloat(text.replace(',', '.'));
 
