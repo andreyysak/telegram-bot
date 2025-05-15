@@ -1,16 +1,25 @@
+export const CAR_MENU = {
+  TRIP: '🛣️ Поїздка',
+  SERVICE: '⚙️ ТО',
+  FUEL: '⛽ Паливо',
+  WASH: '🚿 Мийка',
+  TRIP_HISTORY: '📜 Історія поїздок',
+  BACK: '⬅️ Назад',
+};
+
 export const carMenuKeyboard = {
   keyboard: [
     [
-      { text: '🛣️ Поїздка' },
-      { text: '⚙️ ТО' }
+      { text: CAR_MENU.TRIP },
+      { text: CAR_MENU.SERVICE }
     ],
     [
-      { text: '⛽ Паливо' },
-      { text: '🚿 Мийка' }
+      { text: CAR_MENU.FUEL },
+      { text: CAR_MENU.WASH }
     ],
     [
-      { text: '📜 Історія поїздок' },
-      { text: '⬅️ Назад' }
+      { text: CAR_MENU.TRIP_HISTORY },
+      { text: CAR_MENU.BACK }
     ],
   ],
   resize_keyboard: true,

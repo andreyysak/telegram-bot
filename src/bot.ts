@@ -7,9 +7,9 @@ import { tripHistoryModule } from './modules/car/tripHistory.js';
 import { weatherModule } from './modules/weather/weather.js';
 
 import { contactKeyboard } from './keyboard/shareContact.js';
-import { mainMenuKeyboard } from './keyboard/mainMenu.js';
-import { carMenuKeyboard } from './keyboard/carMenu.js';
-import { backToMainKeyboard } from './keyboard/backToMenu.js';
+import { CAR_MENU_TEXT, mainMenuKeyboard } from './keyboard/mainMenu.js';
+import { CAR_MENU, carMenuKeyboard } from './keyboard/carMenu.js';
+import { BACK_TO_MAIN_TEXT, backToMainKeyboard } from './keyboard/backToMenu.js';
 import { SessionData } from './types/SessionData.js';
 
 
@@ -104,25 +104,25 @@ bot.on(':text', async (ctx) => {
   }
 
   // Якщо користувач уже зареєстрований, обробляємо команди
-  if (text === '⬅️ Назад до головного меню') {
+  if (text === BACK_TO_MAIN_TEXT) {
     return ctx.reply('Головне меню:', {
       reply_markup: mainMenuKeyboard,
     });
   }
 
-  if (text === '🏎️ Авто') {
+  if (text === CAR_MENU_TEXT) {
     return ctx.reply('🏎️ Обрано Авто', {
       reply_markup: carMenuKeyboard,
     });
   }
 
-  if (text === '⬅️ Назад') {
+  if (text === BACK_TO_MAIN_TEXT) {
     return ctx.reply('⬅️ Повертаємось назад', {
       reply_markup: mainMenuKeyboard,
     });
   }
 
-  if (text === '🛣️ Поїздка') {
+  if (text === CAR_MENU.TRIP) {
     await ctx.reply('Введи кількість кілометрів:', {
       reply_markup: backToMainKeyboard,
     });

@@ -1,8 +1,11 @@
+export const CAR_MENU_TEXT = '🏎️ Авто';
+export const WEATHER_MENU_TEXT = '⛅ Погода';
+
 export const mainMenuKeyboard = {
   keyboard: [
     [
-      { text: '🏎️ Авто' }, 
-      { text: '⛅ Погода' }
+      { text: CAR_MENU_TEXT },
+      { text: WEATHER_MENU_TEXT }
     ],
   ],
   resize_keyboard: true,
