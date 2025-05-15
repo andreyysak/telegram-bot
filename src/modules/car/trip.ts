@@ -1,5 +1,3 @@
-// src/modules/car/trip.ts
-
 import { Composer } from 'grammy';
 import pool from '../../db/client.js';
 import { carMenuKeyboard } from '../../keyboard/carMenu.js';
@@ -8,7 +6,7 @@ import { BotContext } from '../../bot.js'; // Це вже має тип SessionD
 export const tripModule = new Composer<BotContext>();
 
 tripModule.hears('PathComponent', async (ctx) => {
-  await ctx.reply('Введіть кількість кілометрів:', {
+  await ctx.reply('Введи кілометраж:', {
     reply_markup: { remove_keyboard: true },
   });
 
@@ -28,7 +26,7 @@ tripModule.on(':text').filter(
     const km = parseFloat(text.replace(',', '.'));
 
     if (isNaN(km)) {
-      return ctx.reply('❌ Будь ласка, введіть правильне число.');
+      return ctx.reply('❌ Будь ласка, введи правильне число.');
     }
 
     // ✅ Зберігаємо кілометри в загальному типі SessionData
@@ -38,7 +36,7 @@ tripModule.on(':text').filter(
       state: 'awaiting_direction',
     };
 
-    await ctx.reply('Введіть напрямок поїздки:\n(наприклад: Львів → Київ)');
+    await ctx.reply('Вееди напрямок поїздки:');
   }
 );
 

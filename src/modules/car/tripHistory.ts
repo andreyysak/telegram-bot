@@ -32,8 +32,8 @@ tripHistoryModule.hears('📜 Історія поїздок', async (ctx) => {
     );
 
     if (tripsRes.rows.length === 0) {
-      return ctx.reply('📭 У вас ще немає записів про поїздки.', {
-        reply_markup: { remove_keyboard: true },
+      return ctx.reply('📭 У тебе ще немає записів про поїздки.', {
+        reply_markup: carMenuKeyboard,
       });
     }
 

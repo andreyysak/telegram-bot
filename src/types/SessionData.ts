@@ -14,10 +14,10 @@ export type SessionData = {
   };
 
   gas?: {
-    state: 'awaiting_liters' | 'awaiting_price_per_liter' | 'awaiting_total_price';
+    state: 'awaiting_liters' | 'awaiting_total_price' | 'awaiting_gas_stattion';
     liters?: number;
-    pricePerLiter?: number;
     totalPrice?: number;
+    gas_stattion?: string
   };
 
   wash?: {
@@ -25,4 +25,8 @@ export type SessionData = {
     description?: string;
     cost?: number;
   };
+
+  weather?: {
+    state: 'weather_session'
+  }
 };

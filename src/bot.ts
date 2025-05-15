@@ -3,13 +3,15 @@ import dotenv from 'dotenv';
 import pool from './db/client.js';
 
 import { tripModule } from './modules/car/trip.js';
+import { tripHistoryModule } from './modules/car/tripHistory.js';
+import { weatherModule } from './modules/weather/weather.js';
 
 import { contactKeyboard } from './keyboard/shareContact.js';
 import { mainMenuKeyboard } from './keyboard/mainMenu.js';
 import { carMenuKeyboard } from './keyboard/carMenu.js';
 import { backToMainKeyboard } from './keyboard/backToMenu.js';
 import { SessionData } from './types/SessionData.js';
-import { tripHistoryModule } from './modules/car/tripHistory.js';
+
 
 dotenv.config();
 
@@ -32,10 +34,11 @@ bot.use(
 
 bot.use(tripModule)
 bot.use(tripHistoryModule)
+bot.use(weatherModule)
 
 // === Команда /start ===
 bot.command('start', async (ctx) => {
-  await ctx.reply('Привіт! Щоб почати роботу, будь ласка, поділіться своїм контактом:', {
+  await ctx.reply('Привіт! Щоб почати роботу, поділись своїм контактом:', {
     reply_markup: contactKeyboard,
   });
 });
@@ -73,7 +76,7 @@ bot.on(':contact', async (ctx) => {
         reply_markup: mainMenuKeyboard,
       });
     } else {
-      await ctx.reply(`👋 Привіт знову, ${first_name}!`, {
+      await ctx.reply(`👋 Привіт, ${first_name}!`, {
         reply_markup: mainMenuKeyboard,
       });
     }
@@ -95,7 +98,7 @@ bot.on(':text', async (ctx) => {
 
   // Якщо користувач ще не зареєстрований
   if (!ctx.session.registered) {
-    return ctx.reply('Будь ласка, спочатку поділіться своїм контактом.', {
+    return ctx.reply('Спочатку поділись своїм контактом.', {
       reply_markup: contactKeyboard,
     });
   }
@@ -107,8 +110,8 @@ bot.on(':text', async (ctx) => {
     });
   }
 
-  if (text === '🚗 Car') {
-    return ctx.reply('🚗 Ви обрали Car', {
+  if (text === '🏎️ Авто') {
+    return ctx.reply('🏎️ Обрано Авто', {
       reply_markup: carMenuKeyboard,
     });
   }
@@ -120,7 +123,7 @@ bot.on(':text', async (ctx) => {
   }
 
   if (text === '🛣️ Поїздка') {
-    await ctx.reply('Введіть кількість кілометрів:', {
+    await ctx.reply('Введи кількість кілометрів:', {
       reply_markup: backToMainKeyboard,
     });
 
