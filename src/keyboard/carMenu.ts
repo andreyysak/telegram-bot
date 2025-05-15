@@ -1,3 +1,5 @@
+import { BACK_TO_MAIN_TEXT } from "./backToMenu.js";
+
 export const CAR_MENU = {
   TRIP: '🛣️ Поїздка',
   SERVICE: '⚙️ ТО',
@@ -6,7 +8,6 @@ export const CAR_MENU = {
   TRIP_HISTORY: '📜 Історія поїздок',
   STATISTIC: '📊 Статистика',
   DOWNLOAD: '💾 Експорт',
-  BACK: '⬅️ Назад',
 };
 
 export const carMenuKeyboard = {
@@ -25,7 +26,7 @@ export const carMenuKeyboard = {
     ],
     [
       { text: CAR_MENU.DOWNLOAD },
-      { text: CAR_MENU.BACK }
+      { text: BACK_TO_MAIN_TEXT }
     ],
   ],
   resize_keyboard: true,

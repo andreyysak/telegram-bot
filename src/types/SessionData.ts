@@ -28,5 +28,9 @@ export type SessionData = {
 
   weather?: {
     state: 'weather_session'
-  }
+  },
+
+  ipinfo?: {
+    state: 'awaiting_ip'
+  },
 };

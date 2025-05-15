@@ -1,4 +1,4 @@
-import { Bot, Context, session, SessionFlavor } from 'grammy';
+import { Bot, Context, GrammyError, HttpError, session, SessionFlavor } from 'grammy';
 import dotenv from 'dotenv';
 import pool from './db/client.js';
 
@@ -6,12 +6,14 @@ import { tripModule } from './modules/car/trip.js';
 import { tripHistoryModule } from './modules/car/tripHistory.js';
 import { weatherModule } from './modules/weather/weather.js';
 import { gasModule } from './modules/car/gas.js';
+import { ipInfoModule } from './modules/network/ipinfo.js';
 
 import { contactKeyboard } from './keyboard/shareContact.js';
-import { CAR_MENU_TEXT, mainMenuKeyboard } from './keyboard/mainMenu.js';
+import { CAR_MENU_TEXT, mainMenuKeyboard, NETWORK_MENU_TEXT } from './keyboard/mainMenu.js';
 import { carMenuKeyboard } from './keyboard/carMenu.js';
 import { BACK_TO_MAIN_TEXT } from './keyboard/backToMenu.js';
 import { SessionData } from './types/SessionData.js';
+import { networkMenuKeyboard } from './keyboard/networkMenu.js';
 
 dotenv.config();
 
@@ -23,7 +25,7 @@ if (!token) throw new Error('Telegram bot token was not found');
 
 const bot = new Bot<BotContext>(token);
 
-// === Сесія ===
+// Сесія
 bot.use(
   session({
     initial: (): SessionData => ({
@@ -32,19 +34,21 @@ bot.use(
   })
 );
 
+// Імпорт модулів
 bot.use(tripModule)
 bot.use(tripHistoryModule)
 bot.use(weatherModule)
 bot.use(gasModule)
+bot.use(ipInfoModule)
 
-// === Команда /start ===
+// Команда start
 bot.command('start', async (ctx) => {
   await ctx.reply('Привіт! Щоб почати роботу, поділись своїм контактом:', {
     reply_markup: contactKeyboard,
   });
 });
 
-// === Обробка отриманого контакту ===
+// Обробка отриманого контакту
 bot.on(':contact', async (ctx) => {
   const contact = ctx.message?.contact;
   const username = ctx.from?.username;
@@ -74,7 +78,7 @@ bot.on(':contact', async (ctx) => {
       const user = res.rows[0];
       console.log('Користувач збережений:', user);
       await ctx.reply('✅ Реєстрація успішна!', {
-        reply_markup: mainMenuKeyboard,
+        reply_markup: mainMenuKeyboard
       });
     } else {
       await ctx.reply(`👋 Привіт, ${first_name}!`, {
@@ -93,34 +97,46 @@ bot.on(':contact', async (ctx) => {
   }
 });
 
-// === Обробка всіх інших повідомлень (до реєстрації) ===
-bot.on(':text', async (ctx) => {
-  const text = ctx.message?.text;
+// Головне меню
+bot.hears(BACK_TO_MAIN_TEXT, async (ctx) => {
+  await ctx.reply('⬅️ Повертаємось назад', {
+    reply_markup: mainMenuKeyboard,
+  });
+});
 
-  // Якщо користувач ще не зареєстрований
-  if (!ctx.session.registered) {
-    return ctx.reply('Спочатку поділись своїм контактом.', {
+bot.hears(CAR_MENU_TEXT, async (ctx) => {
+  await ctx.reply('🚗 Ти обрав авто', {
+    reply_markup: carMenuKeyboard,
+  });
+});
+
+bot.hears(NETWORK_MENU_TEXT, async (ctx) => {
+  await ctx.reply('🌐 Ти обрав мережу', {
+    reply_markup: networkMenuKeyboard
+  })
+})
+
+// Обробка тексту для незареєстрованих користувачів
+bot.on(':text').filter(
+  (ctx): boolean => !ctx.session.registered,
+  async (ctx) => {
+    return ctx.reply('Будь ласка, спочатку поділіться своїм контактом.', {
       reply_markup: contactKeyboard,
     });
   }
+);
 
-  // Якщо користувач уже зареєстрований, обробляємо команди
-  if (text === BACK_TO_MAIN_TEXT) {
-    return ctx.reply('Головне меню:', {
-      reply_markup: mainMenuKeyboard,
-    });
-  }
-
-  if (text === CAR_MENU_TEXT) {
-    return ctx.reply('🏎️ Обрано Авто', {
-      reply_markup: carMenuKeyboard,
-    });
-  }
-
-  if (text === BACK_TO_MAIN_TEXT) {
-    return ctx.reply('⬅️ Повертаємось назад', {
-      reply_markup: mainMenuKeyboard,
-    });
+// Обробка помилок
+bot.catch((err) => {
+  const ctx = err.ctx;
+  console.error(`Помилка під час обробки оновлення ${ctx.update.update_id}:`);
+  const e = err.error;
+  if (e instanceof GrammyError) {
+    console.error("Помилка в запиті:", e.description);
+  } else if (e instanceof HttpError) {
+    console.error("Не вдалося звʼязатися з Telegram:", e);
+  } else {
+    console.error("Невідома помилка:", e);
   }
 });
 
