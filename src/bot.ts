@@ -14,6 +14,7 @@ import { carMenuKeyboard } from './keyboard/carMenu.js';
 import { BACK_TO_MAIN_TEXT } from './keyboard/backToMenu.js';
 import { SessionData } from './types/SessionData.js';
 import { networkMenuKeyboard } from './keyboard/networkMenu.js';
+import { pingModule } from './modules/network/ping.js';
 
 dotenv.config();
 
@@ -37,9 +38,10 @@ bot.use(
 // Імпорт модулів
 bot.use(tripModule)
 bot.use(tripHistoryModule)
-bot.use(weatherModule)
 bot.use(gasModule)
+bot.use(weatherModule)
 bot.use(ipInfoModule)
+bot.use(pingModule)
 
 // Команда start
 bot.command('start', async (ctx) => {

@@ -31,6 +31,10 @@ export type SessionData = {
   },
 
   ipinfo?: {
-    state: 'awaiting_ip'
+    state: 'awaiting_ip' | null
   },
+
+  ping?: {
+    state: 'ping_session' | null
+  }
 };

@@ -1,4 +1,3 @@
-// src/modules/network/ipinfo.ts
 import { Composer } from 'grammy';
 import { BotContext } from '../../bot.js';
 import { IPINFO_MENU_TEXT, networkMenuKeyboard } from '../../keyboard/networkMenu.js';
@@ -6,7 +5,7 @@ import { getIpData } from '../../services/ipinfo.js';
 
 export const ipInfoModule = new Composer<BotContext>();
 
-// === Кнопка меню ===
+// Кнопка меню
 ipInfoModule.hears(IPINFO_MENU_TEXT, async (ctx) => {
   ctx.session.ipinfo = {
     state: 'awaiting_ip',
@@ -15,7 +14,7 @@ ipInfoModule.hears(IPINFO_MENU_TEXT, async (ctx) => {
   await ctx.reply('📍 Введіть IP-адресу:');
 });
 
-// === Обробка тексту ТІЛЬКИ якщо стан awaiting_ip ===
+// Обробка тексту ТІЛЬКИ якщо стан awaiting_ip
 ipInfoModule.on(':text').filter(
   (ctx): boolean => ctx.session.ipinfo?.state === 'awaiting_ip',
   async (ctx) => {
