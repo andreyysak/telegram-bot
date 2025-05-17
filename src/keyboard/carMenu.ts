@@ -5,7 +5,7 @@ export const CAR_MENU = {
   SERVICE: '⚙️ ТО',
   FUEL: '⛽ Паливо',
   WASH: '🚿 Мийка',
-  TRIP_HISTORY: '📜 Історія поїздок',
+  HISTORY: '📜 Історія',
   STATISTIC: '📊 Статистика',
   DOWNLOAD: '💾 Експорт',
 };
@@ -21,7 +21,7 @@ export const carMenuKeyboard = {
       { text: CAR_MENU.WASH }
     ],
     [
-      { text: CAR_MENU.TRIP_HISTORY },
+      { text: CAR_MENU.HISTORY },
       { text: CAR_MENU.STATISTIC }
     ],
     [

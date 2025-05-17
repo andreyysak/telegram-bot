@@ -1,12 +1,12 @@
+// src/modules/car/gasHistoryModule.ts
 import { Composer } from 'grammy';
 import pool from '../../db/client.js';
 import { BotContext } from '../../bot.js';
 import { carMenuKeyboard } from '../../keyboard/carMenu.js';
 
-export const tripHistoryModule = new Composer<BotContext>();
+export const gasHistoryModule = new Composer<BotContext>();
 
-// === Callback Query для inline-клавіатури ===
-tripHistoryModule.callbackQuery('history_trip', async (ctx) => {
+gasHistoryModule.callbackQuery('history_gas', async (ctx) => {
   const telegramUserId = ctx.from?.id;
 
   if (!telegramUserId) {
@@ -28,36 +28,35 @@ tripHistoryModule.callbackQuery('history_trip', async (ctx) => {
 
     const dbUserId = userRes.rows[0].id;
 
-    // Отримуємо останні 10 поїздок
-    const tripsRes = await pool.query(
-      'SELECT kilometers, direction, created_at FROM trips WHERE user_id = $1 ORDER BY created_at DESC LIMIT 10',
+    // Отримуємо останні 10 заправок
+    const gasRes = await pool.query(
+      'SELECT liters, total_price, station, created_at FROM gas_refuels WHERE user_id = $1 ORDER BY created_at DESC LIMIT 10',
       [dbUserId]
     );
 
-    if (tripsRes.rows.length === 0) {
-      return ctx.reply('📭 У тебе ще немає записів про поїздки.', {
+    if (gasRes.rows.length === 0) {
+      return ctx.reply('📭 У тебе ще немає записів про заправку автомобіля.', {
         reply_markup: carMenuKeyboard,
       });
     }
 
     // Форматуємо текст історії
-    const historyText = tripsRes.rows.map((row, index) => {
+    const historyText = gasRes.rows.map((row, index) => {
       const date = new Date(row.created_at);
       const time = date.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }); // 17:52
       const fullDate = date.toLocaleDateString('uk-UA'); // 14.05.2025
-      const direction = row.direction || 'Невідомий напрямок';
 
-      return `${index + 1}. ${direction} | ${row.kilometers} км | ${time} | ${fullDate}`;
+      return `${index + 1}. ${row.station} | ${row.liters} л | ${row.total_price} грн | ${time} | ${fullDate}`;
     }).join('\n');
 
-    await ctx.reply(`📄 Історія поїздок:\n\n${historyText}`, {
+    await ctx.reply(`📄 Історія заправок:\n\n${historyText}`, {
       reply_markup: carMenuKeyboard,
     });
 
     await ctx.answerCallbackQuery(); // Прибираємо годинник "завантаження" після натискання
 
   } catch (e) {
-    console.error('Помилка при отриманні історії:', e);
+    console.error('Помилка при отриманні історії заправок:', e);
     await ctx.reply('⚠️ Сталася помилка при завантаженні історії.');
     await ctx.answerCallbackQuery();
   }
