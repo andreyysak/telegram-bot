@@ -23,9 +23,8 @@ export type SessionData = {
   };
 
   wash?: {
-    state: 'awaiting_description' | 'awaiting_cost';
-    description?: string;
-    cost?: number;
+    state: 'awaiting_price' | null
+    price?: number;
   };
 
   weather?: {

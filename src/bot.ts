@@ -19,6 +19,7 @@ import { carHistoryModule } from './modules/car/carHistory.js';
 import { gasHistoryModule } from './modules/car/gasHistory.js';
 import { maintenanceModule } from './modules/car/maintenanceModule.js';
 import { maintenanceHistoryModule } from './modules/car/maintenanceHistory.js';
+import { washModule } from './modules/car/washModule.js';
 
 
 dotenv.config();
@@ -46,10 +47,12 @@ bot.use(
 bot.use(tripModule)
 bot.use(gasModule)
 bot.use(maintenanceModule)
+bot.use(washModule)
 bot.use(carHistoryModule)
 bot.use(tripHistoryModule)
 bot.use(gasHistoryModule)
 bot.use(maintenanceHistoryModule)
+
 
 bot.use(weatherModule)
 
