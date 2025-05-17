@@ -1,54 +1,82 @@
 import { Composer } from 'grammy';
 import pool from '../../db/client.js';
-import { BotContext } from '../../bot.js';
-import { carMenuKeyboard } from '../../keyboard/carMenu.js';
+import { CAR_MENU, carMenuKeyboard } from '../../keyboard/carMenu.js';
+import { BotContext } from '../../bot.js'; 
 
 export const tripModule = new Composer<BotContext>();
 
-tripModule.hears('🛣️ Поїздка', async (ctx) => {
-  await ctx.reply('Введіть кількість кілометрів:', {
+tripModule.hears(CAR_MENU.TRIP, async (ctx) => {
+  await ctx.reply('Введи кілометраж:', {
     reply_markup: { remove_keyboard: true },
   });
-  ctx.session.state = 'awaiting_kilometers';
+
+  // ✅ Додаємо або скидаємо попередню сесію trip
+  ctx.session.trip = {
+    state: 'awaiting_kilometers',
+  };
 });
 
 tripModule.on(':text').filter(
-  (ctx): boolean => ctx.session.state === 'awaiting_kilometers',
+  (ctx): boolean => ctx.session.trip?.state === 'awaiting_kilometers',
   async (ctx) => {
-    const text = ctx.message?.text?.trim();
-    const userId = ctx.from?.id;
+    const text = ctx.message?.text.trim();
 
-    if (!userId) return ctx.reply('Помилка: не можу отримати ID користувача.');
-
-    if (!text) throw new Error('Не отримано жодних даних.')
+    if (!text) throw new Error('❌ Не отримано жодних даних.')
 
     const km = parseFloat(text.replace(',', '.'));
 
     if (isNaN(km)) {
-      return ctx.reply('Будь ласка, введіть правильне число.');
+      return ctx.reply('❌ Будь ласка, введи правильне число.');
     }
 
+    // ✅ Зберігаємо кілометри в загальному типі SessionData
+    ctx.session.trip = {
+      ...ctx.session.trip,
+      km,
+      state: 'awaiting_direction',
+    };
+
+    await ctx.reply('Вееди напрямок поїздки:');
+  }
+);
+
+tripModule.on(':text').filter(
+  (ctx): boolean => ctx.session.trip?.state === 'awaiting_direction',
+  async (ctx) => {
+    const text = ctx.message?.text.trim();
+
+    const userId = ctx.from?.id;
+
     try {
-      const res = await pool.query(
+      const userRes = await pool.query(
         'SELECT id FROM users WHERE telegram_user_id = $1',
         [userId]
       );
-
-      if (res.rows.length === 0) {
+      if (userRes.rows.length === 0) {
         return ctx.reply('Користувача не знайдено у системі.');
       }
 
-      const dbUserId = res.rows[0].id;
+      const dbUserId = userRes.rows[0].id;
+      const km = ctx.session.trip?.km;
+      const direction = text;
 
+      if (!km) {
+        return ctx.reply('❌ Не вдалося отримати кілометри');
+      }
+
+      // ✅ Зберігаємо до БД
       await pool.query(
-        'INSERT INTO trips (user_id, kilometers) VALUES ($1, $2)',
-        [dbUserId, km]
+        'INSERT INTO trips (user_id, kilometers, direction) VALUES ($1, $2, $3)',
+        [dbUserId, km, direction]
       );
 
-      await ctx.reply(`✅ Кілометраж ${km} км успішно збережено.`, {
-        reply_markup: carMenuKeyboard
+      await ctx.reply(`✅ Поїздка: ${km} км\n🧭 Напрямок: ${direction}`, {
+        reply_markup: carMenuKeyboard,
       });
-      ctx.session.state = null;
+
+      // ✅ Чистимо стан
+      ctx.session.trip = undefined;
+
     } catch (e) {
       console.error('Помилка при збереженні поїздки:', e);
       await ctx.reply('⚠️ Сталася помилка при збереженні.');

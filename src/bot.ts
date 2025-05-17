@@ -1,25 +1,21 @@
-import { Bot, Context, session } from 'grammy';
+import { Bot, Context, session, SessionFlavor } from 'grammy';
 import dotenv from 'dotenv';
 import pool from './db/client.js';
 
 import { tripModule } from './modules/car/trip.js';
+import { tripHistoryModule } from './modules/car/tripHistory.js';
+import { weatherModule } from './modules/weather/weather.js';
+import { gasModule } from './modules/car/gas.js';
 
 import { contactKeyboard } from './keyboard/shareContact.js';
-import { mainMenuKeyboard } from './keyboard/mainMenu.js';
+import { CAR_MENU_TEXT, mainMenuKeyboard } from './keyboard/mainMenu.js';
 import { carMenuKeyboard } from './keyboard/carMenu.js';
-import { backToMainKeyboard } from './keyboard/backToMenu.js';
+import { BACK_TO_MAIN_TEXT } from './keyboard/backToMenu.js';
+import { SessionData } from './types/SessionData.js';
 
 dotenv.config();
 
-// === Тип для контексту з сесією ===
-interface SessionData {
-  state: 'awaiting_kilometers' | null;
-  registered?: boolean; // додаємо стан зареєстрованого користувача
-}
-
-export type BotContext = Context & {
-  session: SessionData;
-};
+export type BotContext = Context & SessionFlavor<SessionData>;
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -31,17 +27,19 @@ const bot = new Bot<BotContext>(token);
 bot.use(
   session({
     initial: (): SessionData => ({
-      state: null,
       registered: false,
     }),
   })
 );
 
 bot.use(tripModule)
+bot.use(tripHistoryModule)
+bot.use(weatherModule)
+bot.use(gasModule)
 
 // === Команда /start ===
 bot.command('start', async (ctx) => {
-  await ctx.reply('Привіт! Щоб почати роботу, будь ласка, поділіться своїм контактом:', {
+  await ctx.reply('Привіт! Щоб почати роботу, поділись своїм контактом:', {
     reply_markup: contactKeyboard,
   });
 });
@@ -79,7 +77,7 @@ bot.on(':contact', async (ctx) => {
         reply_markup: mainMenuKeyboard,
       });
     } else {
-      await ctx.reply(`👋 Привіт знову, ${first_name}!`, {
+      await ctx.reply(`👋 Привіт, ${first_name}!`, {
         reply_markup: mainMenuKeyboard,
       });
     }
@@ -101,35 +99,28 @@ bot.on(':text', async (ctx) => {
 
   // Якщо користувач ще не зареєстрований
   if (!ctx.session.registered) {
-    return ctx.reply('Будь ласка, спочатку поділіться своїм контактом.', {
+    return ctx.reply('Спочатку поділись своїм контактом.', {
       reply_markup: contactKeyboard,
     });
   }
 
   // Якщо користувач уже зареєстрований, обробляємо команди
-  if (text === '⬅️ Назад до головного меню') {
+  if (text === BACK_TO_MAIN_TEXT) {
     return ctx.reply('Головне меню:', {
       reply_markup: mainMenuKeyboard,
     });
   }
 
-  if (text === '🚗 Car') {
-    return ctx.reply('🚗 Ви обрали Car', {
+  if (text === CAR_MENU_TEXT) {
+    return ctx.reply('🏎️ Обрано Авто', {
       reply_markup: carMenuKeyboard,
     });
   }
 
-  if (text === '⬅️ Назад') {
+  if (text === BACK_TO_MAIN_TEXT) {
     return ctx.reply('⬅️ Повертаємось назад', {
       reply_markup: mainMenuKeyboard,
     });
-  }
-
-  if (text === '🛣️ Поїздка') {
-    await ctx.reply('Введіть кількість кілометрів:', {
-      reply_markup: backToMainKeyboard,
-    });
-    ctx.session.state = 'awaiting_kilometers';
   }
 });
 

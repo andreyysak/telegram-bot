@@ -1,8 +1,10 @@
+export const SHARE_CONTACT_TEXT = '📞 Поділитися контактом';
+
 export const contactKeyboard = {
   keyboard: [
     [
       {
-        text: '📞 Поділитися контактом',
+        text: SHARE_CONTACT_TEXT,
         request_contact: true,
       },
     ],
