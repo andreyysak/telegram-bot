@@ -1,13 +1,13 @@
 import { Composer } from 'grammy';
 import pool from '../../db/client.js';
 import { CAR_MENU, carMenuKeyboard } from '../../keyboard/carMenu.js';
-import { BotContext } from '../../bot.js'; 
+import { BotContext } from '../../bot.js';
 
 export const tripModule = new Composer<BotContext>();
 
 tripModule.hears(CAR_MENU.TRIP, async (ctx) => {
   await ctx.reply('Введи кілометраж:', {
-    reply_markup: { remove_keyboard: true },
+    reply_markup: carMenuKeyboard,
   });
 
   // ✅ Додаємо або скидаємо попередню сесію trip
@@ -26,7 +26,9 @@ tripModule.on(':text').filter(
     const km = parseFloat(text.replace(',', '.'));
 
     if (isNaN(km)) {
-      return ctx.reply('❌ Будь ласка, введи правильне число.');
+      return ctx.reply('❌ Будь ласка, введи правильне число.', {
+        reply_markup: carMenuKeyboard,
+      });
     }
 
     // ✅ Зберігаємо кілометри в загальному типі SessionData
@@ -36,7 +38,9 @@ tripModule.on(':text').filter(
       state: 'awaiting_direction',
     };
 
-    await ctx.reply('Вееди напрямок поїздки:');
+    await ctx.reply('Вееди напрямок поїздки:', {
+      reply_markup: carMenuKeyboard,
+    });
   }
 );
 
@@ -61,7 +65,9 @@ tripModule.on(':text').filter(
       const direction = text;
 
       if (!km) {
-        return ctx.reply('❌ Не вдалося отримати кілометри');
+        return ctx.reply('❌ Не вдалося отримати кілометри', {
+          reply_markup: carMenuKeyboard,
+        });
       }
 
       // ✅ Зберігаємо до БД
@@ -79,7 +85,9 @@ tripModule.on(':text').filter(
 
     } catch (e) {
       console.error('Помилка при збереженні поїздки:', e);
-      await ctx.reply('⚠️ Сталася помилка при збереженні.');
+      await ctx.reply('⚠️ Сталася помилка при збереженні.', {
+        reply_markup: carMenuKeyboard,
+      });
     }
   }
 );

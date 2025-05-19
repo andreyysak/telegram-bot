@@ -1,5 +1,6 @@
 export type SessionData = {
   registered?: boolean;
+  restricted?: boolean;
 
   trip?: {
     state: 'awaiting_kilometers' | 'awaiting_direction';
@@ -8,8 +9,9 @@ export type SessionData = {
   };
 
   maintenance?: {
-    state: 'awaiting_description' | 'awaiting_cost';
-    description?: string;
+    state: 'awaiting_work_type' | 'awaiting_kilometers' | 'awaiting_cost';
+    workType?: string;
+    km?: number;
     cost?: number;
   };
 
@@ -21,12 +23,27 @@ export type SessionData = {
   };
 
   wash?: {
-    state: 'awaiting_description' | 'awaiting_cost';
-    description?: string;
-    cost?: number;
+    state: 'awaiting_price' | null
+    price?: number;
   };
 
   weather?: {
     state: 'weather_session'
+  },
+
+  ipinfo?: {
+    state: 'awaiting_ip' | null
+  },
+
+  ping?: {
+    state: 'ping_session' | null
+  },
+
+  license_plate?: {
+    state: 'awaiting_license_plate' | null
+  },
+
+  todo?: {
+    state: 'add_todo' | null
   }
 };
