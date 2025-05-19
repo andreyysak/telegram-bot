@@ -2,7 +2,7 @@ export const CAR_MENU_TEXT = '🏎️ Авто';
 export const WEATHER_MENU_TEXT = '⛅ Погода';
 export const NETWORK_MENU_TEXT = '🌐 Мережа'
 export const APPS_MENU_TEXT = '🤖 Додатки'
-export const TODO_MENU_TEXT = '✅ Todo list'
+export const TODO_MENU_TEXT = '✅ Список справ'
 
 export const mainMenuKeyboard = {
   keyboard: [

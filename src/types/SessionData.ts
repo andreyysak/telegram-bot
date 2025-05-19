@@ -41,5 +41,9 @@ export type SessionData = {
 
   license_plate?: {
     state: 'awaiting_license_plate' | null
+  },
+
+  todo?: {
+    state: 'add_todo' | null
   }
 };

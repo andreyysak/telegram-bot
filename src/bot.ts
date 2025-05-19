@@ -11,7 +11,7 @@ import { pingModule } from './modules/network/ping.js';
 import { licensePlate } from './modules/apps/licensePlate.js';
 
 import { contactKeyboard } from './keyboard/shareContact.js';
-import { APPS_MENU_TEXT, CAR_MENU_TEXT, mainMenuKeyboard, mainMenuKeyboardRestricted, NETWORK_MENU_TEXT, WEATHER_MENU_TEXT } from './keyboard/mainMenu.js';
+import { APPS_MENU_TEXT, CAR_MENU_TEXT, mainMenuKeyboard, mainMenuKeyboardRestricted, NETWORK_MENU_TEXT, TODO_MENU_TEXT, WEATHER_MENU_TEXT } from './keyboard/mainMenu.js';
 import { carMenuKeyboard } from './keyboard/carMenu.js';
 import { BACK_TO_MAIN_TEXT } from './keyboard/backToMenu.js';
 import { SessionData } from './types/SessionData.js';
@@ -21,6 +21,9 @@ import { maintenanceModule } from './modules/car/maintenanceModule.js';
 import { maintenanceHistoryModule } from './modules/car/maintenanceHistory.js';
 import { washModule } from './modules/car/washModule.js';
 import { washHistoryModule } from './modules/car/washHistory.js';
+import { networkMenuKeyboard } from './keyboard/networkMenu.js';
+import { appsMenuKeyboard } from './keyboard/appsKeyboard.js';
+import { todoKeyboard } from './keyboard/todoKeyboard.js';
 
 
 dotenv.config();
@@ -154,20 +157,29 @@ bot.hears(BACK_TO_MAIN_TEXT, async (ctx) => {
 });
 
 // === Головне меню для обмежених користувачів ===
-bot.hears([WEATHER_MENU_TEXT, NETWORK_MENU_TEXT, APPS_MENU_TEXT], async (ctx) => {
+bot.hears([WEATHER_MENU_TEXT, NETWORK_MENU_TEXT, APPS_MENU_TEXT, TODO_MENU_TEXT], async (ctx) => {
   const userId = ctx.from?.id;
 
-  if(!userId) throw new Error('Не знайдено userId.')
+  if (!userId) throw new Error('Не знайдено userId.')
 
   if (allowedUserIds.includes(userId)) {
     if (ctx.match === WEATHER_MENU_TEXT) {
       return ctx.reply('⛅ Ти обрав Погоду');
     }
     if (ctx.match === NETWORK_MENU_TEXT) {
-      return ctx.reply('🌐 Ти обрав Мережу');
+      return ctx.reply('🌐 Ти обрав Мережу', {
+        reply_markup: networkMenuKeyboard
+      });
     }
     if (ctx.match === APPS_MENU_TEXT) {
-      return ctx.reply('🤖 Ти обрав Додатки');
+      return ctx.reply('🤖 Ти обрав Додатки', {
+        reply_markup: appsMenuKeyboard
+      });
+    }
+    if (ctx.match === TODO_MENU_TEXT) {
+      return ctx.reply('✅ Ти обрав Список справ', {
+        reply_markup: todoKeyboard
+      });
     }
   } else {
     await ctx.reply('⛔️ У вас немає доступу до цього пункту меню.', {
