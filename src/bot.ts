@@ -9,6 +9,8 @@ import { gasModule } from './modules/car/gas.js';
 import { ipInfoModule } from './modules/network/ipinfo.js';
 import { pingModule } from './modules/network/ping.js';
 import { licensePlate } from './modules/apps/licensePlate.js';
+import { statisticModule } from './modules/car/statistic.js';
+import { exportModule } from './modules/car/export.js';
 
 import { contactKeyboard } from './keyboard/shareContact.js';
 import { APPS_MENU_TEXT, CAR_MENU_TEXT, mainMenuKeyboard, mainMenuKeyboardRestricted, NETWORK_MENU_TEXT, TODO_MENU_TEXT, WEATHER_MENU_TEXT } from './keyboard/mainMenu.js';
@@ -24,7 +26,6 @@ import { washHistoryModule } from './modules/car/washHistory.js';
 import { networkMenuKeyboard } from './keyboard/networkMenu.js';
 import { appsMenuKeyboard } from './keyboard/appsKeyboard.js';
 import { todoKeyboard } from './keyboard/todoKeyboard.js';
-
 
 dotenv.config();
 
@@ -52,6 +53,8 @@ bot.use(tripModule)
 bot.use(gasModule)
 bot.use(maintenanceModule)
 bot.use(washModule)
+bot.use(statisticModule)
+bot.use(exportModule)
 bot.use(carHistoryModule)
 bot.use(tripHistoryModule)
 bot.use(gasHistoryModule)
