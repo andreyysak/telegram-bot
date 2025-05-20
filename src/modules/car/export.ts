@@ -1,4 +1,3 @@
-// src/modules/car/exportModule.ts
 import { Composer } from "grammy";
 import { BotContext } from "../../bot.js";
 import pool from "../../db/client.js";
@@ -8,24 +7,28 @@ import fs from 'fs';
 import { promisify } from 'util';
 import { InputFile } from 'grammy';
 import { exportCarKeyboard } from "../../keyboard/exportCarKeyboard.js";
+import { uploadFileToDrive } from '../../services/googleDrive.js';
 
 const unlinkAsync = promisify(fs.unlink);
+
+const TELEGRAM_USER_ID = process.env.ADMIN_USER_ID
+
+if (!TELEGRAM_USER_ID) throw new Error('Немає id для адміна.')
 
 export const exportModule = new Composer<BotContext>();
 
 exportModule.hears(CAR_MENU.DOWNLOAD, async (ctx) => {
   await ctx.reply('Обери, що ти хочеш експортувати: ', {
-    reply_markup: exportCarKeyboard
-  })
-})
+    reply_markup: exportCarKeyboard,
+  });
+});
 
 exportModule.callbackQuery(/^export_(trip|gas|wash|maintenance)$/, async (ctx) => {
   const [, type] = ctx.match;
-
   const telegramUserId = ctx.from?.id;
 
   if (!telegramUserId) {
-    return ctx.reply('❌ Не вдалося отримати ID користувача.');
+    return ctx.reply('❌ Не вдалося отримати ваш Telegram ID.');
   }
 
   try {
@@ -72,22 +75,44 @@ exportModule.callbackQuery(/^export_(trip|gas|wash|maintenance)$/, async (ctx) =
     // Експортуємо в CSV
     const filePath = await exportToCsv(type, data.rows);
 
-    // Відправляємо файл через InputFile
-    await ctx.replyWithDocument(
-      new InputFile(fs.createReadStream(filePath), `${type}_export.csv`), // ✅ Так працює!
-      {
-        caption: `📄 Файл експорту для "${type}"`,
+    // Перевірка: чи це ти? 😎
+    if (telegramUserId === +TELEGRAM_USER_ID) {
+      try {
+        const FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID || undefined;
+
+        const { webViewLink } = await uploadFileToDrive(filePath, FOLDER_ID);
+
+        await ctx.replyWithDocument(
+          new InputFile(fs.createReadStream(filePath), `${type}_export.csv`),
+          {
+            caption: `📄 Файл експорту для "${type}"\n🔗 Посилання: ${webViewLink}`,
+          }
+        );
+
+      } catch (e: any) {
+        console.error('⚠️ Не вдалося завантажити на Google Drive:', e.message || e);
+        await ctx.replyWithDocument(
+          new InputFile(fs.createReadStream(filePath), `${type}_export.csv`),
+          {
+            caption: `⚠️ Файл експорту для "${type}" (не вдалося завантажити на Google Drive)`,
+          }
+        );
       }
-    );
+    } else {
+      await ctx.replyWithDocument(
+        new InputFile(fs.createReadStream(filePath), `${type}_export.csv`),
+        {
+          caption: `📄 Файл експорту для "${type}"`,
+        }
+      );
+    }
 
-    // Видаляємо файл після відправки
     await unlinkAsync(filePath);
-
     await ctx.answerCallbackQuery();
 
   } catch (e) {
-    console.error(`Помилка при експорті ${type}:`, e);
-    await ctx.reply('⚠️ Сталася помилка при експорті даних.');
+    console.error(`Помилка при обробці ${type}:`, e);
+    await ctx.reply('⚠️ Сталася помилка при обробці запиту.');
     await ctx.answerCallbackQuery();
   }
 });
