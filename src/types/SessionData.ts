@@ -3,7 +3,7 @@ export type SessionData = {
   restricted?: boolean;
 
   trip?: {
-    state: 'awaiting_kilometers' | 'awaiting_direction';
+    state: 'awaiting_kilometers' | 'awaiting_direction' | null;
     km?: number;
     direction?: string;
   };
@@ -44,6 +44,7 @@ export type SessionData = {
   },
 
   todo?: {
-    state: 'add_todo' | null
+    state: 'add_todo' | 'list_todo' | 'delete_todo' | 'complete_todo' | 'edit_todo' | 'export_todo_table' | null,
+    title?: string,
   }
 };

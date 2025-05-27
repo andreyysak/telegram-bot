@@ -26,6 +26,8 @@ import { washHistoryModule } from './modules/car/washHistory.js';
 import { networkMenuKeyboard } from './keyboard/networkMenu.js';
 import { appsMenuKeyboard } from './keyboard/appsKeyboard.js';
 import { todoKeyboard } from './keyboard/todoKeyboard.js';
+import { addTodoModule } from './modules/todo/addTodo.js';
+import { listTodoModule } from './modules/todo/listTodo.js';
 
 dotenv.config();
 
@@ -62,6 +64,8 @@ bot.use(maintenanceHistoryModule)
 bot.use(washHistoryModule)
 
 bot.use(weatherModule)
+bot.use(addTodoModule)
+bot.use(listTodoModule)
 
 bot.use(ipInfoModule)
 bot.use(pingModule)

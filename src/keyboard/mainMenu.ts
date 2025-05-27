@@ -8,13 +8,8 @@ export const mainMenuKeyboard = {
   keyboard: [
     [
       { text: CAR_MENU_TEXT },
-      { text: WEATHER_MENU_TEXT },
-    ],
-    [
       { text: TODO_MENU_TEXT },
-      { text: NETWORK_MENU_TEXT },
     ],
-    [{ text: APPS_MENU_TEXT }]
   ],
   resize_keyboard: true,
   one_time_keyboard: false,
@@ -23,7 +18,6 @@ export const mainMenuKeyboard = {
 export const mainMenuKeyboardRestricted = {
   keyboard: [
     [{ text: CAR_MENU_TEXT }],
-    // [{ text: '⛔️ Доступ заблоковано' }],
   ],
   resize_keyboard: true,
   one_time_keyboard: false,
