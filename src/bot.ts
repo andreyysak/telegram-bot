@@ -28,6 +28,7 @@ import { appsMenuKeyboard } from './keyboard/appsKeyboard.js';
 import { todoKeyboard } from './keyboard/todoKeyboard.js';
 import { addTodoModule } from './modules/todo/addTodo.js';
 import { listTodoModule } from './modules/todo/listTodo.js';
+import { completeTodoModule } from './modules/todo/completeTodo.js';
 
 dotenv.config();
 
@@ -66,6 +67,7 @@ bot.use(washHistoryModule)
 bot.use(weatherModule)
 bot.use(addTodoModule)
 bot.use(listTodoModule)
+bot.use(completeTodoModule)
 
 bot.use(ipInfoModule)
 bot.use(pingModule)
