@@ -29,6 +29,7 @@ import { todoKeyboard } from './keyboard/todoKeyboard.js';
 import { addTodoModule } from './modules/todo/addTodo.js';
 import { listTodoModule } from './modules/todo/listTodo.js';
 import { completeTodoModule } from './modules/todo/completeTodo.js';
+import { deleteTodoModule } from './modules/todo/deleteTodo.js';
 
 dotenv.config();
 
@@ -68,6 +69,7 @@ bot.use(weatherModule)
 bot.use(addTodoModule)
 bot.use(listTodoModule)
 bot.use(completeTodoModule)
+bot.use(deleteTodoModule)
 
 bot.use(ipInfoModule)
 bot.use(pingModule)
