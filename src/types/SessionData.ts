@@ -44,7 +44,8 @@ export type SessionData = {
   },
 
   todo?: {
-    state: 'add_todo' | 'list_todo' | 'delete_todo' | 'complete_todo' | 'edit_todo' | 'export_todo_table' | null,
+    state: 'add_todo' | 'list_todo' | 'delete_todo' | 'complete_todo' | 'edit_todo_index' | 'edit_todo_title' | 'export_todo_table' | null,
     title?: string,
+    todoId?: number
   }
 };

@@ -30,6 +30,7 @@ import { addTodoModule } from './modules/todo/addTodo.js';
 import { listTodoModule } from './modules/todo/listTodo.js';
 import { completeTodoModule } from './modules/todo/completeTodo.js';
 import { deleteTodoModule } from './modules/todo/deleteTodo.js';
+import { editTodoModule } from './modules/todo/editTodo.js';
 
 dotenv.config();
 
@@ -52,7 +53,7 @@ bot.use(
   })
 );
 
-// Імпорт модулів
+// ⁡⁣⁣⁢Імпорт модулів⁡
 bot.use(tripModule)
 bot.use(gasModule)
 bot.use(maintenanceModule)
@@ -70,6 +71,7 @@ bot.use(addTodoModule)
 bot.use(listTodoModule)
 bot.use(completeTodoModule)
 bot.use(deleteTodoModule)
+bot.use(editTodoModule)
 
 bot.use(ipInfoModule)
 bot.use(pingModule)
