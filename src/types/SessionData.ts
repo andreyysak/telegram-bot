@@ -48,4 +48,10 @@ export type SessionData = {
     title?: string,
     todoId?: number
   }
+
+  expense_tracker?: {
+    state: 'type' | 'category' | 'amount';
+    type?: 'income' | 'expense';
+    category?: string;
+  }
 };
