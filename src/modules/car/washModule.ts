@@ -48,6 +48,11 @@ washModule.on(':text').filter(
 
       const dbUserId = userRes.rows[0].id;
 
+      await pool.query(
+        'INSERT INTO expense_tracker (user_id, type, category, amount) VALUES ($1, $2, $3, $4)',
+        [dbUserId, 'expense', 'avto', price]
+      );
+
       // Зберігаємо мийку
       await pool.query(
         'INSERT INTO car_washes (user_id, price) VALUES ($1, $2)',

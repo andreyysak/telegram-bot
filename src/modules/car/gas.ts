@@ -92,6 +92,12 @@ gasModule.callbackQuery(/gas_/, async (ctx) => {
     const dbUserId = userRes.rows[0].id;
     const { liters, totalPrice } = gasData;
 
+    // Додаємо витрату в expense_tracker
+    await pool.query(
+      'INSERT INTO expense_tracker (user_id, type, category, amount) VALUES ($1, $2, $3, $4)',
+      [dbUserId, 'expense', 'avto', totalPrice]
+    );
+
     await pool.query(
       'INSERT INTO gas_refuels (user_id, liters, total_price, station) VALUES ($1, $2, $3, $4)',
       [dbUserId, liters, totalPrice, station]
