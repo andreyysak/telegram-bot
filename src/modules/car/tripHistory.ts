@@ -40,15 +40,23 @@ tripHistoryModule.callbackQuery('history_trip', async (ctx) => {
       });
     }
 
-    // Форматуємо текст історії
-    const historyText = tripsRes.rows.map((row, index) => {
-      const date = new Date(row.created_at);
-      const time = date.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }); // 17:52
-      const fullDate = date.toLocaleDateString('uk-UA'); // 14.05.2025
-      const direction = row.direction || 'Невідомий напрямок';
+    const historyText = tripsRes.rows
+      .map((row, index, array) => {
+        const currentKm = row.kilometers;
+        const prevKm = index < array.length - 1 ? array[index + 1].kilometers : null;
+        const distance = prevKm !== null ? (currentKm - prevKm) : 0;
 
-      return `${index + 1}. ${direction} | ${row.kilometers} км | ${time} | ${fullDate}`;
-    }).join('\n');
+        const date = new Date(row.created_at);
+        const time = date.toLocaleTimeString('uk-UA', {
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+        const fullDate = date.toLocaleDateString('uk-UA');
+        const direction = row.direction || 'Невідомий напрямок';
+
+        return `${index + 1}. ${direction} | ${distance} км | ${time} | ${fullDate}`;
+      })
+      .join('\n');
 
     await ctx.reply(`📄 Історія поїздок:\n\n${historyText}`, {
       reply_markup: carMenuKeyboard,
