@@ -23,7 +23,7 @@ expenseTrackerModule.hears([EXPENSE_TEXT.income, EXPENSE_TEXT.expense], async (c
   });
 })
 
-expenseTrackerModule.callbackQuery(/^komunalni_platezhi|produkty|avto|pidpysky|rozvagy|podorozhi|liky|zasoby_osobystoi_hihieny|sport|podarunky|osvita|odyag_ta_vzuttya|zvyazok_ta_internet|knygy_ta_samoosvita|pobutovi_tovary_ta_remont|robochi_vytraty_biznes|investytsii|vidkladennya|inshe|salary|gift_income|investment_returns|side_job|other_income$/, async (ctx) => {
+expenseTrackerModule.callbackQuery(/^komunalni_platezhi|produkty|avto|pidpysky|rozvagy|podorozhi|liky|taxi|zasoby_osobystoi_hihieny|sport|podarunky|osvita|odyag_ta_vzuttya|zvyazok_ta_internet|knygy_ta_samoosvita|pobutovi_tovary_ta_remont|robochi_vytraty_biznes|investytsii|vidkladennya|inshe|salary|gift_income|investment_returns|side_job|other_income$/, async (ctx) => {
   const category = ctx.callbackQuery.data;
   const type = ctx.session.expense_tracker?.type;
 

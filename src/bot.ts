@@ -34,6 +34,7 @@ import { editTodoModule } from './modules/todo/editTodo.js';
 import { expenseTrackerMainMenu } from './keyboard/expenseTrackerMenu.js';
 import { expenseTrackerModule } from './modules/expense_tracker/expenseTracker.js';
 import { expenseHistoryModule } from './modules/expense_tracker/expenseHistory.js';
+import { salaryModule } from './modules/salary/salaryModule.js';
 
 dotenv.config();
 
@@ -82,6 +83,8 @@ bot.use(weatherModule)
 bot.use(ipInfoModule)
 bot.use(pingModule)
 bot.use(licensePlate)
+bot.use(salaryModule)
+
 
 // Команда start
 bot.command('start', async (ctx) => {
@@ -153,6 +156,12 @@ bot.use(async (ctx, next) => {
 
   ctx.session.restricted = false;
   return next();
+});
+
+bot.command("myid", (ctx) => {
+  const chatId = ctx.chat.id;
+  console.log("Chat ID:", chatId); // Виведе в консоль
+  ctx.reply(`Твій Chat ID: \`${chatId}\``, { parse_mode: "Markdown" }); // Надішле в чат
 });
 
 // === Головне меню (тепер з перевіркою прав) ===

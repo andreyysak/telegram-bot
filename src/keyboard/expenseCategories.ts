@@ -19,7 +19,7 @@ export const expenseCategories = new InlineKeyboard()
   .row()
   .text('📈 Інвестиції', 'investytsii').text('💸 Відкладення', 'vidkladennya')
   .row()
-  .text('📌 Інше', 'inshe')
-  .row();
+  .text('🚕 Таксі', 'taxi').text('📺 Техніка', 'tech')
+  .row()
+  .text('📌 Інше', 'inshe');
 
-  
