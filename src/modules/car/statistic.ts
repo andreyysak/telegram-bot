@@ -1,11 +1,14 @@
 import { Composer } from "grammy";
 import { BotContext } from "../../bot.js";
-import { CAR_MENU, carMenuKeyboard } from "../../keyboard/carMenu.js";
+import { CAR_MENU } from "../../keyboard/carMenu.js";
+import { carStatisticMenu } from "../../keyboard/carStatisticMenu.js";
 
 export const statisticModule = new Composer<BotContext>()
 
 statisticModule.hears(CAR_MENU.STATISTIC, async (ctx) => {
-  await ctx.reply('Поки що не готово...', {
-    reply_markup: carMenuKeyboard
+  await ctx.reply('Ти обрав статистику', {
+    reply_markup: carStatisticMenu
   })
 })
+
+statisticModule.callbackQuery('history_trip', )
