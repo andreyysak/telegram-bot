@@ -27,4 +27,6 @@ export const CATEGORY_UA_ICONS = {
   investytsii: { name: 'Інвестиції', icon: '📈' },
   vidkladennya: { name: 'Відкладення', icon: '💸' },
   inshe: { name: 'Інше', icon: '📌' },
+  taxi: { name: 'Таксі', icon: '🚕' },
+  tech: { name: 'Техніка', icon: '📺' },
 };
