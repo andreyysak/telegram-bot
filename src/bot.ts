@@ -9,9 +9,11 @@ import { gasModule } from './modules/car/gas.js';
 import { ipInfoModule } from './modules/network/ipinfo.js';
 import { pingModule } from './modules/network/ping.js';
 import { licensePlate } from './modules/apps/licensePlate.js';
+import { statisticModule } from './modules/car/statistic.js';
+import { exportModule } from './modules/car/export.js';
 
 import { contactKeyboard } from './keyboard/shareContact.js';
-import { APPS_MENU_TEXT, CAR_MENU_TEXT, mainMenuKeyboard, mainMenuKeyboardRestricted, NETWORK_MENU_TEXT, TODO_MENU_TEXT, WEATHER_MENU_TEXT } from './keyboard/mainMenu.js';
+import { APPS_MENU_TEXT, CAR_MENU_TEXT, EXPENSE_TRACKER_MENU_TEXT, mainMenuKeyboard, mainMenuKeyboardRestricted, NETWORK_MENU_TEXT, TODO_MENU_TEXT, WEATHER_MENU_TEXT } from './keyboard/mainMenu.js';
 import { carMenuKeyboard } from './keyboard/carMenu.js';
 import { BACK_TO_MAIN_TEXT } from './keyboard/backToMenu.js';
 import { SessionData } from './types/SessionData.js';
@@ -24,7 +26,14 @@ import { washHistoryModule } from './modules/car/washHistory.js';
 import { networkMenuKeyboard } from './keyboard/networkMenu.js';
 import { appsMenuKeyboard } from './keyboard/appsKeyboard.js';
 import { todoKeyboard } from './keyboard/todoKeyboard.js';
-
+import { addTodoModule } from './modules/todo/addTodo.js';
+import { listTodoModule } from './modules/todo/listTodo.js';
+import { completeTodoModule } from './modules/todo/completeTodo.js';
+import { deleteTodoModule } from './modules/todo/deleteTodo.js';
+import { editTodoModule } from './modules/todo/editTodo.js';
+import { expenseTrackerMainMenu } from './keyboard/expenseTrackerMenu.js';
+import { expenseTrackerModule } from './modules/expense_tracker/expenseTracker.js';
+import { expenseHistoryModule } from './modules/expense_tracker/expenseHistory.js';
 
 dotenv.config();
 
@@ -47,22 +56,31 @@ bot.use(
   })
 );
 
-// Імпорт модулів
+// ⁡⁣⁣⁢Імпорт модулів⁡
 bot.use(tripModule)
 bot.use(gasModule)
 bot.use(maintenanceModule)
 bot.use(washModule)
+bot.use(statisticModule)
+bot.use(exportModule)
 bot.use(carHistoryModule)
 bot.use(tripHistoryModule)
 bot.use(gasHistoryModule)
 bot.use(maintenanceHistoryModule)
 bot.use(washHistoryModule)
 
-bot.use(weatherModule)
+bot.use(addTodoModule)
+bot.use(listTodoModule)
+bot.use(completeTodoModule)
+bot.use(deleteTodoModule)
+bot.use(editTodoModule)
 
+bot.use(expenseTrackerModule)
+bot.use(expenseHistoryModule)
+
+bot.use(weatherModule)
 bot.use(ipInfoModule)
 bot.use(pingModule)
-
 bot.use(licensePlate)
 
 // Команда start
@@ -157,7 +175,7 @@ bot.hears(BACK_TO_MAIN_TEXT, async (ctx) => {
 });
 
 // === Головне меню для обмежених користувачів ===
-bot.hears([WEATHER_MENU_TEXT, NETWORK_MENU_TEXT, APPS_MENU_TEXT, TODO_MENU_TEXT], async (ctx) => {
+bot.hears([WEATHER_MENU_TEXT, NETWORK_MENU_TEXT, APPS_MENU_TEXT, TODO_MENU_TEXT, EXPENSE_TRACKER_MENU_TEXT], async (ctx) => {
   const userId = ctx.from?.id;
 
   if (!userId) throw new Error('Не знайдено userId.')
@@ -179,6 +197,11 @@ bot.hears([WEATHER_MENU_TEXT, NETWORK_MENU_TEXT, APPS_MENU_TEXT, TODO_MENU_TEXT]
     if (ctx.match === TODO_MENU_TEXT) {
       return ctx.reply('✅ Ти обрав Список справ', {
         reply_markup: todoKeyboard
+      });
+    }
+    if (ctx.match === EXPENSE_TRACKER_MENU_TEXT) {
+      return ctx.reply('💰 Ти обрав Трекер витрат', {
+        reply_markup: expenseTrackerMainMenu
       });
     }
   } else {

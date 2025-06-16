@@ -2,6 +2,8 @@ import { Composer } from 'grammy';
 import pool from '../../db/client.js';
 import { CAR_MENU, carMenuKeyboard } from '../../keyboard/carMenu.js';
 import { BotContext } from '../../bot.js';
+import { BACK_TO_MAIN_TEXT } from '../../keyboard/backToMenu.js';
+import { mainMenuKeyboard } from '../../keyboard/mainMenu.js';
 
 export const tripModule = new Composer<BotContext>();
 
@@ -15,6 +17,16 @@ tripModule.hears(CAR_MENU.TRIP, async (ctx) => {
     state: 'awaiting_kilometers',
   };
 });
+
+tripModule.hears(BACK_TO_MAIN_TEXT, async (ctx) => {
+  await ctx.reply('⬅️ Назад до головного меню', {
+    reply_markup: mainMenuKeyboard
+  })
+  
+  ctx.session.trip = {
+    state: null
+  }
+})
 
 tripModule.on(':text').filter(
   (ctx): boolean => ctx.session.trip?.state === 'awaiting_kilometers',

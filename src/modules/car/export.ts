@@ -1,0 +1,118 @@
+import { Composer } from "grammy";
+import { BotContext } from "../../bot.js";
+import pool from "../../db/client.js";
+import { CAR_MENU, carMenuKeyboard } from "../../keyboard/carMenu.js";
+import { exportToCsv } from "../../services/exportToCsv.js";
+import fs from 'fs';
+import { promisify } from 'util';
+import { InputFile } from 'grammy';
+import { exportCarKeyboard } from "../../keyboard/exportCarKeyboard.js";
+import { uploadFileToDrive } from '../../services/googleDrive.js';
+
+const unlinkAsync = promisify(fs.unlink);
+
+const TELEGRAM_USER_ID = process.env.ADMIN_USER_ID
+
+if (!TELEGRAM_USER_ID) throw new Error('Немає id для адміна.')
+
+export const exportModule = new Composer<BotContext>();
+
+exportModule.hears(CAR_MENU.DOWNLOAD, async (ctx) => {
+  await ctx.reply('Обери, що ти хочеш експортувати: ', {
+    reply_markup: exportCarKeyboard,
+  });
+});
+
+exportModule.callbackQuery(/^export_(trip|gas|wash|maintenance)$/, async (ctx) => {
+  const [, type] = ctx.match;
+  const telegramUserId = ctx.from?.id;
+
+  if (!telegramUserId) {
+    return ctx.reply('❌ Не вдалося отримати ваш Telegram ID.');
+  }
+
+  try {
+    // Отримуємо ID користувача з БД
+    const userRes = await pool.query(
+      'SELECT id FROM users WHERE telegram_user_id = $1',
+      [telegramUserId]
+    );
+
+    if (userRes.rows.length === 0) {
+      return ctx.reply('❌ Користувача не знайдено у системі.');
+    }
+
+    const dbUserId = userRes.rows[0].id;
+    let data;
+
+    switch (type) {
+      case 'trip':
+        data = await pool.query('SELECT kilometers, direction, created_at FROM trips WHERE user_id = $1 ORDER BY created_at DESC', [dbUserId]);
+        break;
+
+      case 'gas':
+        data = await pool.query('SELECT liters, total_price AS price, station, created_at FROM gas_refuels WHERE user_id = $1 ORDER BY created_at DESC', [dbUserId]);
+        break;
+
+      case 'wash':
+        data = await pool.query('SELECT price, created_at FROM car_washes WHERE user_id = $1 ORDER BY created_at DESC', [dbUserId]);
+        break;
+
+      case 'maintenance':
+        data = await pool.query('SELECT description, cost, created_at FROM maintenances WHERE user_id = $1 ORDER BY created_at DESC', [dbUserId]);
+        break;
+
+      default:
+        return ctx.reply('❌ Непідтримуваний тип даних для експорту');
+    }
+
+    if (data.rows.length === 0) {
+      return ctx.reply(`📭 У вас ще немає записів для експорту ${type}`, {
+        reply_markup: carMenuKeyboard,
+      });
+    }
+
+    // Експортуємо в CSV
+    const filePath = await exportToCsv(type, data.rows);
+
+    // Перевірка: чи це ти? 😎
+    if (telegramUserId === +TELEGRAM_USER_ID) {
+      try {
+        const FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID || undefined;
+
+        const { webViewLink } = await uploadFileToDrive(filePath, FOLDER_ID);
+
+        await ctx.replyWithDocument(
+          new InputFile(fs.createReadStream(filePath), `${type}_export.csv`),
+          {
+            caption: `📄 Файл експорту для "${type}"\n🔗 Посилання: ${webViewLink}`,
+          }
+        );
+
+      } catch (e: any) {
+        console.error('⚠️ Не вдалося завантажити на Google Drive:', e.message || e);
+        await ctx.replyWithDocument(
+          new InputFile(fs.createReadStream(filePath), `${type}_export.csv`),
+          {
+            caption: `⚠️ Файл експорту для "${type}" (не вдалося завантажити на Google Drive)`,
+          }
+        );
+      }
+    } else {
+      await ctx.replyWithDocument(
+        new InputFile(fs.createReadStream(filePath), `${type}_export.csv`),
+        {
+          caption: `📄 Файл експорту для "${type}"`,
+        }
+      );
+    }
+
+    await unlinkAsync(filePath);
+    await ctx.answerCallbackQuery();
+
+  } catch (e) {
+    console.error(`Помилка при обробці ${type}:`, e);
+    await ctx.reply('⚠️ Сталася помилка при обробці запиту.');
+    await ctx.answerCallbackQuery();
+  }
+});
