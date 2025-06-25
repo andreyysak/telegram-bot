@@ -8,7 +8,10 @@ export const gasModule = new Composer<BotContext>()
 
 gasModule.hears(CAR_MENU.FUEL, async (ctx) => {
   await ctx.reply('Введи кількість літрів:', {
-    reply_markup: carMenuKeyboard,
+    reply_markup: {
+      force_reply: true,
+      input_field_placeholder: 'Наприклад: 45',
+    }
   })
 
   ctx.session.gas = {
@@ -37,7 +40,12 @@ gasModule.on(':text').filter(
       state: 'awaiting_total_price'
     }
 
-    await ctx.reply('💸 Введи витрачену суму:')
+    await ctx.reply('💸 Введи витрачену суму:', {
+      reply_markup: {
+        force_reply: true,
+        input_field_placeholder: 'Наприклад: 2499',
+      }
+    })
   }
 )
 

@@ -1,4 +1,4 @@
-export const BACK_TO_MAIN_TEXT = '⬅️ Назад до головного меню';
+export const BACK_TO_MAIN_TEXT = '⬅️';
 
 export const backToMainKeyboard = {
   keyboard: [
