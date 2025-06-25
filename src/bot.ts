@@ -39,6 +39,7 @@ bot.use(
 );
 
 // ⁡⁣⁣⁢Імпорт модулів⁡
+bot.use(tripModule)
 bot.use(gasModule)
 bot.use(statisticModule)
 bot.use(exportModule)

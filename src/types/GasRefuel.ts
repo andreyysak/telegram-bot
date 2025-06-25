@@ -1,4 +1,5 @@
 export interface GasRefuel {
+  id: number;
   liters: number;
   totalPrice: number;
   station: string;

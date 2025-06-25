@@ -27,26 +27,8 @@ export type SessionData = {
     price?: number;
   };
 
-  weather?: {
-    state: 'weather_session'
-  },
-
-  ipinfo?: {
-    state: 'awaiting_ip' | null
-  },
-
-  ping?: {
-    state: 'ping_session' | null
-  },
-
-  license_plate?: {
-    state: 'awaiting_license_plate' | null
-  },
-
-  todo?: {
-    state: 'add_todo' | 'list_todo' | 'delete_todo' | 'complete_todo' | 'edit_todo_index' | 'edit_todo_title' | 'export_todo_table' | null,
-    title?: string,
-    todoId?: number
+  statistic?: {
+    state: 'await_statistic' | null;
   }
 
   expense_tracker?: {
