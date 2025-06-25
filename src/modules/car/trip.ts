@@ -2,31 +2,21 @@ import { Composer } from 'grammy';
 import pool from '../../db/client.js';
 import { CAR_MENU, carMenuKeyboard } from '../../keyboard/carMenu.js';
 import { BotContext } from '../../bot.js';
-import { BACK_TO_MAIN_TEXT } from '../../keyboard/backToMenu.js';
-import { mainMenuKeyboard } from '../../keyboard/mainMenu.js';
 
 export const tripModule = new Composer<BotContext>();
 
 tripModule.hears(CAR_MENU.TRIP, async (ctx) => {
   await ctx.reply('Введи кілометраж:', {
-    reply_markup: carMenuKeyboard,
+    reply_markup: {
+      force_reply: true,
+      input_field_placeholder: 'Наприклад: 275657',
+    }
   });
 
-  // ✅ Додаємо або скидаємо попередню сесію trip
   ctx.session.trip = {
     state: 'awaiting_kilometers',
   };
 });
-
-tripModule.hears(BACK_TO_MAIN_TEXT, async (ctx) => {
-  await ctx.reply('⬅️ Назад до головного меню', {
-    reply_markup: mainMenuKeyboard
-  })
-  
-  ctx.session.trip = {
-    state: null
-  }
-})
 
 tripModule.on(':text').filter(
   (ctx): boolean => ctx.session.trip?.state === 'awaiting_kilometers',
@@ -51,7 +41,10 @@ tripModule.on(':text').filter(
     };
 
     await ctx.reply('Вееди напрямок поїздки:', {
-      reply_markup: carMenuKeyboard,
+      reply_markup: {
+        force_reply: true,
+        input_field_placeholder: 'Наприклад: по Хмельницькому',
+      }
     });
   }
 );
