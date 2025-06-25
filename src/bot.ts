@@ -5,7 +5,6 @@ import pool from './db/client.js';
 import { tripModule } from './modules/car/trip.js';
 import { gasModule } from './modules/car/gas.js';
 import { statisticModule } from './modules/car/statistic.js';
-import { exportModule } from './modules/car/export.js';
 
 import { contactKeyboard } from './keyboard/shareContact.js';
 import { APPS_MENU_TEXT, CAR_MENU_TEXT, EXPENSE_TRACKER_MENU_TEXT, mainMenuKeyboard, mainMenuKeyboardRestricted } from './keyboard/mainMenu.js';
@@ -42,7 +41,6 @@ bot.use(
 bot.use(tripModule)
 bot.use(gasModule)
 bot.use(statisticModule)
-bot.use(exportModule)
 
 bot.use(expenseTrackerModule)
 bot.use(expenseHistoryModule)
