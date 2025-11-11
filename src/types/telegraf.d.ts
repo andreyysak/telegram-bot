@@ -1,10 +1,7 @@
-export interface SessionData {
-  user_id?: number;
-  telegram_user_id?: string;
-  name?: string;
-  phone?: string;
+import { SessionData } from "./context";
 
-  step?: "awaiting_kilometers" | "awaiting_direction";
-  kilometers?: number;
-  direction?: string;
+declare module "telegraf" {
+  interface Context {
+    session: SessionData;
+  }
 }
