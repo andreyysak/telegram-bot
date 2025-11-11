@@ -1,0 +1,8 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.setupHelpCommand = setupHelpCommand;
+function setupHelpCommand(bot) {
+    bot.help((ctx) => {
+        ctx.reply("🧾 Список команд:\n/start — почати\n/help — допомога");
+    });
+}
