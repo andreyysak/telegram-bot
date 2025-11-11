@@ -1,14 +1,21 @@
-import { Telegraf } from "telegraf";
+import { Telegraf, session } from "telegraf";
+import { startTripCommand } from "./commands/trip";
+import { setupStartCommand } from "./commands/start";
+import { MyContext } from "./types/context";
 import { config } from "dotenv";
-import { setupCommands } from "./commands";
 
 config();
 
-export const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN!);
+export const bot = new Telegraf<MyContext>(process.env.TELEGRAM_BOT_TOKEN!);
 
-bot.use(async (ctx, next) => {
-  console.log(`Message from: ${ctx.from?.username}`);
-  await next();
+bot.use(session({
+  defaultSession: () => ({})
+}));
+
+bot.use((ctx, next) => {
+  console.log("📦 Session:", ctx.session);
+  return next();
 });
 
-setupCommands(bot);
+setupStartCommand(bot);
+startTripCommand(bot);

@@ -1,10 +1,13 @@
 import { config } from "dotenv";
 import { bot } from "./bot";
 
-config(); // завантажує .env
+config();
 
 async function launchBot() {
   try {
+    // 🔥 Видаляємо webhook і очищуємо старі оновлення
+    await bot.telegram.deleteWebhook({ drop_pending_updates: true });
+
     await bot.launch();
     console.log("✅ Bot started successfully!");
   } catch (error) {
@@ -12,8 +15,8 @@ async function launchBot() {
   }
 }
 
+// Запуск
 launchBot();
 
-// Graceful stop
 process.once("SIGINT", () => bot.stop("SIGINT"));
 process.once("SIGTERM", () => bot.stop("SIGTERM"));
