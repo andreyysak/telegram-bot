@@ -62,7 +62,7 @@ fuelComposer.on("text", async (ctx, next) => {
     });
 
     const stickerPath = path.resolve("assets/stickers/snowman.tgs");
-    await ctx.sendSticker({ source: stickerPath });
+    await ctx.reply('✅ Готово');
 
     ctx.session.fuelStep = null;
     ctx.session.liters = undefined;

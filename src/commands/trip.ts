@@ -51,7 +51,7 @@ tripComposer.on("text", async (ctx, next) => {
     });
 
     const stickerPath = path.resolve("assets/stickers/greenLezard.tgs");
-    await ctx.sendSticker({ source: stickerPath });
+    await ctx.reply('✅ Готово');
 
     ctx.session.tripStep = null;
     ctx.session.kilometers = undefined;
