@@ -59,7 +59,7 @@ tripComposer.on("text", async (ctx, next) => {
     });
 
     await ctx.sendSticker({
-      source: path.join(__dirname, "../assets/stickers/greenLezard.tgs"),
+      source: path.resolve("assets/stickers/greenLezard.tgs")
     });
 
     ctx.session.tripStep = null;

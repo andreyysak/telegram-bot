@@ -64,7 +64,7 @@ fuelComposer.on("text", async (ctx, next) => {
     });
 
     await ctx.sendSticker({
-      source: path.join(__dirname, "../assets/stickers/frozenOlaf.tgs"),
+      source: path.resolve("assets/stickers/snowman.tgs"),
     });
 
     ctx.session.fuelStep = null;
