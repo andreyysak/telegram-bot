@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Composer } from "telegraf";
 import { MyContext } from "../types/context";
-import path from "path";
 
 const prisma = new PrismaClient();
 export const tripComposer = new Composer<MyContext>();
@@ -50,7 +49,7 @@ tripComposer.on("text", async (ctx, next) => {
       data: { telegram_user_id, kilometrs: km, direction },
     });
 
-    const stickerPath = path.resolve("assets/stickers/greenLezard.tgs");
+    // прибрали стікер
     await ctx.reply('✅ Готово');
 
     ctx.session.tripStep = null;

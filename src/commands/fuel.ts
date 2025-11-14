@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Composer } from "telegraf";
 import { MyContext } from "../types/context";
-import path from "path";
 
 const prisma = new PrismaClient();
 export const fuelComposer = new Composer<MyContext>();
@@ -61,7 +60,7 @@ fuelComposer.on("text", async (ctx, next) => {
       data: { user_id: existingUser.user_id, liters, price, station },
     });
 
-    const stickerPath = path.resolve("assets/stickers/snowman.tgs");
+    // прибрали стікер
     await ctx.reply('✅ Готово');
 
     ctx.session.fuelStep = null;
