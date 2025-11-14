@@ -5,10 +5,10 @@ export interface SessionData {
   telegram_user_id?: string;
   name?: string;
   phone?: string;
-  step?: "awaiting_kilometers" | "awaiting_direction";
+  tripStep?: "awaiting_kilometers" | "awaiting_direction" | null;
+  fuelStep?: "awaiting_liters" | "awaiting_price" | "awaiting_station" | null;
   kilometers?: number;
   direction?: string;
-  fuel?: 'awaiting_liters' | 'awaiting_price' | 'awaiting_station';
   liters?: number;
   price?: number;
   station?: string;

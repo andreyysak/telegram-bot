@@ -1,13 +1,11 @@
 import { Telegraf, session } from "telegraf";
-import { startTripCommand } from "./commands/trip";
 import { setupStartCommand } from "./commands/start";
 import { MyContext } from "./types/context";
 import { config } from "dotenv";
-import { startFuelCommand } from "./commands/fuel";
+import { tripComposer } from "./commands/trip";
+import { fuelComposer } from "./commands/fuel";
 
 config();
-
-console.log("🔑 TELEGRAM_BOT_TOKEN:", JSON.stringify(process.env.TELEGRAM_BOT_TOKEN));
 
 export const bot = new Telegraf<MyContext>(process.env.TELEGRAM_BOT_TOKEN!);
 
@@ -21,5 +19,5 @@ bot.use((ctx, next) => {
 });
 
 setupStartCommand(bot);
-startTripCommand(bot);
-startFuelCommand(bot);
+bot.use(tripComposer);
+bot.use(fuelComposer);

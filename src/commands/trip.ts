@@ -1,72 +1,69 @@
+// src/commands/trip.ts
 import { PrismaClient } from "@prisma/client";
-import { Telegraf } from "telegraf";
+import { Composer } from "telegraf";
 import { MyContext } from "../types/context";
 import path from "path";
 
 const prisma = new PrismaClient();
 
-export function startTripCommand(bot: Telegraf<MyContext>) {
-  bot.command("trip", async (ctx) => {
-    ctx.session.step = "awaiting_kilometers";
-    await ctx.reply("🚗 Введи кілометраж:");
-  });
+export const tripComposer = new Composer<MyContext>();
 
-  bot.on("text", async (ctx) => {
-    if (ctx.session.step === "awaiting_kilometers") {
-      const km = parseFloat(ctx.message.text);
+tripComposer.command("trip", async (ctx) => {
+  ctx.session.tripStep = "awaiting_kilometers";
+  await ctx.reply("🚗 Введи кілометраж:");
+});
 
-      if (isNaN(km) || km <= 0) {
-        return ctx.reply("❌ Введи правильне число");
-      }
+tripComposer.on("text", async (ctx, next) => {
+  if (!ctx.session.tripStep) return next(); // передаємо далі, якщо trip не активний
 
-      ctx.session.kilometers = km;
-      ctx.session.step = "awaiting_direction";
-      return ctx.reply("🧭 Введи напрямок поїздки:");
+  if (ctx.session.tripStep === "awaiting_kilometers") {
+    const km = parseFloat(ctx.message.text);
+    if (isNaN(km) || km <= 0) {
+      return ctx.reply("❌ Введи правильне число");
     }
 
-    if (ctx.session.step === "awaiting_direction") {
-      const direction = ctx.message.text.trim();
-      const km = ctx.session.kilometers;
+    ctx.session.kilometers = km;
+    ctx.session.tripStep = "awaiting_direction";
+    return ctx.reply("🧭 Введи напрямок поїздки:");
+  }
 
-      if (!km) {
-        ctx.session.step = undefined;
-        return ctx.reply("⚠️ Почни спочатку — напиши /trip");
-      }
+  if (ctx.session.tripStep === "awaiting_direction") {
+    const direction = ctx.message.text.trim();
+    const km = ctx.session.kilometers;
 
-      const telegram_user_id = ctx.from?.id.toString();
-      if (!telegram_user_id) {
-        return ctx.reply("❌ Не вдалося визначити твій Telegram ID.");
-      }
+    if (!km) {
+      ctx.session.tripStep = null;
+      return ctx.reply("⚠️ Почни спочатку — напиши /trip");
+    }
 
-      const existingUser = await prisma.user.findUnique({
-        where: { telegram_user_id },
-      });
+    const telegram_user_id = ctx.from?.id.toString();
+    if (!telegram_user_id) return ctx.reply("❌ Не вдалося визначити твій Telegram ID.");
 
-      if (!existingUser) {
-        await prisma.user.create({
-          data: {
-            telegram_user_id,
-            telegram_name: ctx.from?.first_name ?? "Unknown",
-            telegram_username: ctx.from?.username ?? undefined,
-          },
-        });
-      }
-
-      await prisma.trip.create({
+    let existingUser = await prisma.user.findUnique({ where: { telegram_user_id } });
+    if (!existingUser) {
+      existingUser = await prisma.user.create({
         data: {
           telegram_user_id,
-          kilometrs: km,
-          direction,
+          telegram_name: ctx.from?.first_name ?? "Unknown",
+          telegram_username: ctx.from?.username ?? undefined,
         },
       });
-
-      await ctx.sendSticker({
-        source: path.join(__dirname, "../assets/stickers/greenLezard.tgs")
-      });
-
-      ctx.session.step = undefined;
-      ctx.session.kilometers = undefined;
-      ctx.session.direction = undefined;
     }
-  });
-}
+
+    await prisma.trip.create({
+      data: {
+        telegram_user_id,
+        kilometrs: km,
+        direction,
+      },
+    });
+
+    await ctx.sendSticker({
+      source: path.join(__dirname, "../assets/stickers/greenLezard.tgs"),
+    });
+
+    ctx.session.tripStep = null;
+    ctx.session.kilometers = undefined;
+    ctx.session.direction = undefined;
+  }
+});
