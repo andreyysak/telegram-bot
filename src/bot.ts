@@ -3,6 +3,7 @@ import { startTripCommand } from "./commands/trip";
 import { setupStartCommand } from "./commands/start";
 import { MyContext } from "./types/context";
 import { config } from "dotenv";
+import { startFuelCommand } from "./commands/fuel";
 
 config();
 
@@ -21,3 +22,4 @@ bot.use((ctx, next) => {
 
 setupStartCommand(bot);
 startTripCommand(bot);
+startFuelCommand(bot);

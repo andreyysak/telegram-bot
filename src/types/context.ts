@@ -8,6 +8,10 @@ export interface SessionData {
   step?: "awaiting_kilometers" | "awaiting_direction";
   kilometers?: number;
   direction?: string;
+  fuel?: 'awaiting_liters' | 'awaiting_price' | 'awaiting_station';
+  liters?: number;
+  price?: number;
+  station?: string;
 }
 
 
