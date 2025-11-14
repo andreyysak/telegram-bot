@@ -20,6 +20,8 @@ model User {
   created_at        DateTime @default(now())
 
   trips             Trip[]   @relation("UserTrips")
+
+  @@map("User")
 }
 
 model Trip {
@@ -32,4 +34,5 @@ model Trip {
 
   user              User     @relation("UserTrips", fields: [telegram_user_id], references: [telegram_user_id], onDelete: Cascade)
 }
+
 

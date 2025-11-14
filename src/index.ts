@@ -5,8 +5,13 @@ config();
 
 async function launchBot() {
   try {
-    // 🔥 Видаляємо webhook і очищуємо старі оновлення
-    await bot.telegram.deleteWebhook({ drop_pending_updates: true });
+    // 🔥 Пробуємо видалити webhook, але не зупиняємо запуск, якщо буде помилка
+    try {
+      await bot.telegram.deleteWebhook({ drop_pending_updates: true });
+      console.log("🧹 Webhook deleted");
+    } catch (err: any) {
+      console.warn("⚠️ Failed to delete webhook (можливо, бот ще не активований):", err.description || err.message);
+    }
 
     await bot.launch();
     console.log("✅ Bot started successfully!");
@@ -15,7 +20,6 @@ async function launchBot() {
   }
 }
 
-// Запуск
 launchBot();
 
 process.once("SIGINT", () => bot.stop("SIGINT"));

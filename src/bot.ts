@@ -6,6 +6,8 @@ import { config } from "dotenv";
 
 config();
 
+console.log("🔑 TELEGRAM_BOT_TOKEN:", JSON.stringify(process.env.TELEGRAM_BOT_TOKEN));
+
 export const bot = new Telegraf<MyContext>(process.env.TELEGRAM_BOT_TOKEN!);
 
 bot.use(session({
