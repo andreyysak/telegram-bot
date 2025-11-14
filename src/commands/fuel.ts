@@ -1,11 +1,9 @@
-// src/commands/fuel.ts
 import { PrismaClient } from "@prisma/client";
 import { Composer } from "telegraf";
 import { MyContext } from "../types/context";
 import path from "path";
 
 const prisma = new PrismaClient();
-
 export const fuelComposer = new Composer<MyContext>();
 
 fuelComposer.command("fuel", async (ctx) => {
@@ -14,7 +12,7 @@ fuelComposer.command("fuel", async (ctx) => {
 });
 
 fuelComposer.on("text", async (ctx, next) => {
-  if (!ctx.session.fuelStep) return next(); // передаємо далі, якщо fuel не активний
+  if (!ctx.session.fuelStep) return next();
 
   if (ctx.session.fuelStep === "awaiting_liters") {
     const liters = parseFloat(ctx.message.text);
@@ -63,9 +61,8 @@ fuelComposer.on("text", async (ctx, next) => {
       data: { user_id: existingUser.user_id, liters, price, station },
     });
 
-    await ctx.sendSticker({
-      source: path.resolve("assets/stickers/snowman.tgs"),
-    });
+    const stickerPath = path.resolve("assets/stickers/snowman.tgs");
+    await ctx.sendSticker({ source: stickerPath });
 
     ctx.session.fuelStep = null;
     ctx.session.liters = undefined;

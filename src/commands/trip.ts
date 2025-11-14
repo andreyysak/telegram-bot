@@ -1,11 +1,9 @@
-// src/commands/trip.ts
 import { PrismaClient } from "@prisma/client";
 import { Composer } from "telegraf";
 import { MyContext } from "../types/context";
 import path from "path";
 
 const prisma = new PrismaClient();
-
 export const tripComposer = new Composer<MyContext>();
 
 tripComposer.command("trip", async (ctx) => {
@@ -14,13 +12,11 @@ tripComposer.command("trip", async (ctx) => {
 });
 
 tripComposer.on("text", async (ctx, next) => {
-  if (!ctx.session.tripStep) return next(); // передаємо далі, якщо trip не активний
+  if (!ctx.session.tripStep) return next();
 
   if (ctx.session.tripStep === "awaiting_kilometers") {
     const km = parseFloat(ctx.message.text);
-    if (isNaN(km) || km <= 0) {
-      return ctx.reply("❌ Введи правильне число");
-    }
+    if (isNaN(km) || km <= 0) return ctx.reply("❌ Введи правильне число");
 
     ctx.session.kilometers = km;
     ctx.session.tripStep = "awaiting_direction";
@@ -51,16 +47,11 @@ tripComposer.on("text", async (ctx, next) => {
     }
 
     await prisma.trip.create({
-      data: {
-        telegram_user_id,
-        kilometrs: km,
-        direction,
-      },
+      data: { telegram_user_id, kilometrs: km, direction },
     });
 
-    await ctx.sendSticker({
-      source: path.resolve("assets/stickers/greenLezard.tgs")
-    });
+    const stickerPath = path.resolve("assets/stickers/greenLezard.tgs");
+    await ctx.sendSticker({ source: stickerPath });
 
     ctx.session.tripStep = null;
     ctx.session.kilometers = undefined;
