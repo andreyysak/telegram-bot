@@ -56,12 +56,23 @@ fuelComposer.on("text", async (ctx, next) => {
       });
     }
 
+    // знайти останній gas_id
+    const lastFuel = await prisma.fuel.findFirst({
+      orderBy: { gas_id: "desc" },
+    });
+    const newGasId = lastFuel ? lastFuel.gas_id + 1 : 1;
+
     await prisma.fuel.create({
-      data: { user_id: existingUser.user_id, liters, price, station },
+      data: { 
+        gas_id: newGasId, 
+        user_id: existingUser.user_id, 
+        liters, 
+        price, 
+        station 
+      },
     });
 
-    // прибрали стікер
-    await ctx.reply('✅ Готово');
+    await ctx.reply("✅ Готово");
 
     ctx.session.fuelStep = null;
     ctx.session.liters = undefined;

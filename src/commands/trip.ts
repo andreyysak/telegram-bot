@@ -22,38 +22,28 @@ tripComposer.on("text", async (ctx, next) => {
     return ctx.reply("🧭 Введи напрямок поїздки:");
   }
 
-  if (ctx.session.tripStep === "awaiting_direction") {
-    const direction = ctx.message.text.trim();
-    const km = ctx.session.kilometers;
+ if (ctx.session.tripStep === "awaiting_direction") {
+  const direction = ctx.message.text.trim();
+  if (!direction) return ctx.reply("❌ Введи напрямок");
 
-    if (!km) {
-      ctx.session.tripStep = null;
-      return ctx.reply("⚠️ Почни спочатку — напиши /trip");
-    }
+  // створюємо новий Trip у базі
+  await prisma.trip.create({
+    data: {
+      telegram_user_id: ctx.from?.id.toString(), // або ctx.session.userId, якщо ти його зберігаєш
+      kilometrs: ctx.session.kilometers!,
+      direction,
+      // created_at і updated_at заповняться автоматично
+    },
+  });
 
-    const telegram_user_id = ctx.from?.id.toString();
-    if (!telegram_user_id) return ctx.reply("❌ Не вдалося визначити твій Telegram ID.");
+  // очищаємо сесію
+  ctx.session.tripStep = undefined;
+  ctx.session.kilometers = undefined;
 
-    let existingUser = await prisma.user.findUnique({ where: { telegram_user_id } });
-    if (!existingUser) {
-      existingUser = await prisma.user.create({
-        data: {
-          telegram_user_id,
-          telegram_name: ctx.from?.first_name ?? "Unknown",
-          telegram_username: ctx.from?.username ?? undefined,
-        },
-      });
-    }
-
-    await prisma.trip.create({
-      data: { telegram_user_id, kilometrs: km, direction },
-    });
-
-    // прибрали стікер
-    await ctx.reply('✅ Готово');
-
-    ctx.session.tripStep = null;
+  return ctx.reply("✅ Поїздку збережено!");
+  ctx.session.tripStep = null;
     ctx.session.kilometers = undefined;
     ctx.session.direction = undefined;
-  }
+}
+
 });
