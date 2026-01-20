@@ -5,6 +5,7 @@ import { config } from "dotenv";
 import { tripComposer } from "./commands/trip";
 import { fuelComposer } from "./commands/fuel";
 import {balanceComposer} from "./commands/balance";
+import {maintenanceComposer} from "./commands/maintenance";
 
 config();
 
@@ -23,3 +24,4 @@ setupStartCommand(bot);
 bot.use(tripComposer);
 bot.use(fuelComposer);
 bot.use(balanceComposer)
+bot.use(maintenanceComposer)

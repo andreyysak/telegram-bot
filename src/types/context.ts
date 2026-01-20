@@ -13,8 +13,10 @@ export interface SessionData {
   price?: number;
   station?: string;
   balanceStep: 'awaiting_balance' | null;
+  maintenanceStep?: 'awaiting_description' | 'awaiting_odometer';
+  maintenanceDescription?: string;
+  maintenanceOdometer?: number;
 }
-
 
 export interface MyContext extends Context {
   session: SessionData;
