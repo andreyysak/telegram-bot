@@ -26,24 +26,17 @@ tripComposer.on("text", async (ctx, next) => {
   const direction = ctx.message.text.trim();
   if (!direction) return ctx.reply("❌ Введи напрямок");
 
-  // створюємо новий Trip у базі
   await prisma.trip.create({
     data: {
-      telegram_user_id: ctx.from?.id.toString(), // або ctx.session.userId, якщо ти його зберігаєш
+      telegram_user_id: ctx.from?.id.toString(),
       kilometrs: ctx.session.kilometers!,
       direction,
-      // created_at і updated_at заповняться автоматично
     },
   });
 
-  // очищаємо сесію
   ctx.session.tripStep = undefined;
   ctx.session.kilometers = undefined;
 
   return ctx.reply("✅ Поїздку збережено!");
-  ctx.session.tripStep = null;
-    ctx.session.kilometers = undefined;
-    ctx.session.direction = undefined;
 }
-
 });
