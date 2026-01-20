@@ -12,6 +12,7 @@ export interface SessionData {
   liters?: number;
   price?: number;
   station?: string;
+  balanceStep: 'awaiting_balance' | null;
 }
 
 
